@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 __author__='DGideas';
-#Develop:Pandora
+#Release:Pandora
 import os;
 import sys;
 import codecs;
