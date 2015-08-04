@@ -9,12 +9,20 @@ DGStorage 是一个极其适合于存储少量、简单、非结构化数据的�
 
 #方法
 1.在Python3程序中引用DGStorage库：
+    
     import DGStorage
+    
 2.创建一个数据库示例：
+    
     a=DGStorage()
+    
 3.在已有文件夹的基础上创建数据库实例,或者选择一个已有的数据库实例：
+    
     a.createdb('/dev/null')
     a.selectdb('/root/shutdown')
+    
 4.尽情使用吧！
+    
     a.add('20870901','Hello, Future!')
     a.get('20900101')
+    
