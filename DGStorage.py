@@ -63,7 +63,7 @@ class DGStorage:
 		else:
 			index=codecs.open(self.database+'/index/index.dgi','r','utf8');
 			for line in index.readlines():
-				line=line.replace('\n',''); #
+				line=line.replace('\n',''); #去除换行符
 				self.coll.append(str(line));
 			for collection in self.coll:
 				try:
@@ -131,16 +131,73 @@ class DGStorage:
 		key=urllib.parse.quote_plus(key);
 		index=codecs.open(self.database+'/index/index.dgi','r','utf8');
 		for line in index.readlines():
+			line=line.replace('\n',''); #去除换行符
 			self.coll.append(str(line));
 		for collection in self.coll:
 			docindex=codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
 			for line in docindex.readlines():
+				line=line.replace('\n','');
 				linesplit=line.split(',');
 				if key==linesplit[1]:
 					cont=codecs.open(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs','r','utf8');
 					return cont.read();
 		return False;
 				
+	def put(self,key,content):
+		self.clche();
+		key=urllib.parse.quote_plus(key);
+		index=codecs.open(self.database+'/index/index.dgi','r','utf8');
+		for line in index.readlines():
+			line=line.replace('\n',''); #去除换行符
+			self.coll.append(str(line));
+		for collection in self.coll:
+			docindex=codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
+			for line in docindex.readlines():
+				line=line.replace('\n','');
+				linesplit=line.split(',');
+				if key==linesplit[1]:
+					cont=codecs.open(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs','w','utf8');
+					cont.write(content);
+					return True;
+		return False;
+		
+	def remove(self,key):
+		self.clche();
+		key=urllib.parse.quote_plus(key);
+		index=codecs.open(self.database+'/index/index.dgi','r','utf8');
+		for line in index.readlines():
+			line=line.replace('\n',''); #去除换行符
+			self.coll.append(str(line));
+		for collection in self.coll:
+			docindex=codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
+			for line in docindex.readlines():
+				line=line.replace('\n','');
+				linesplit=line.split(',');
+				if key==linesplit[1]:
+					os.remove(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs');
+					docindexr=codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
+					for record in docindexr.readlines():
+						record=record.replace('\n','');
+						record=record.split(',');
+						if record[1]==key:
+							pass;
+						else:
+							self.keycache.append(record[1]);
+							self.uidcache.append(record[0]);
+					i=1;
+					index=codecs.open(self.database+'/'+collection+'/index/index.dgc','w','utf8');
+					index.write('');
+					while i<=len(self.uidcache):
+						index=codecs.open(self.database+'/'+collection+'/index/index.dgc','a','utf8');
+						indexr=codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
+						if len(indexr.readlines())==0:
+							index.write(str(self.uidcache[i-1])+','+str(self.keycache[i-1]));
+						else:
+							index.write('\n'+str(self.uidcache[i-1])+','+str(self.keycache[i-1]));
+						i=i+1;
+					return True;
+		return False;
+
 ##################################################
 #以下方法无需在外部调用
 	def clche(self):
