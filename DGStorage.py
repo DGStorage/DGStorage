@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 __author__='DGideas';
 #Release:Dorado
-import os;
-import sys;
-import codecs;
-import uuid;
-import urllib.parse;
 
 try:
 	os.chdir(os.path.dirname(sys.argv[0]));
@@ -16,6 +11,12 @@ except OSError:
 
 class DGStorage:
 	def __init__(self):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.query=[];
 		self.database='';
 		self.conf={};
@@ -26,6 +27,12 @@ class DGStorage:
 		self.uidcache=[];
 		
 	def selectdb(self,database):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		try:
 			open(database+'/conf.dgb','r');
 		except FileNotFoundError:
@@ -39,6 +46,12 @@ class DGStorage:
 		return True;
 
 	def createdb(self,database):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		try:
 			open(database+'/conf.dgb','r');
 		except FileNotFoundError:
@@ -54,6 +67,12 @@ class DGStorage:
 			return False;
 
 	def add(self,key,content):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.clche();
 		key=urllib.parse.quote_plus(key);
 		try:
@@ -127,6 +146,12 @@ class DGStorage:
 					return False;
 
 	def get(self,key):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.clche();
 		key=urllib.parse.quote_plus(key);
 		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
@@ -144,6 +169,12 @@ class DGStorage:
 		return False;
 				
 	def put(self,key,content):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.clche();
 		key=urllib.parse.quote_plus(key);
 		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
@@ -162,6 +193,12 @@ class DGStorage:
 		return False;
 		
 	def remove(self,key):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.clche();
 		key=urllib.parse.quote_plus(key);
 		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
@@ -204,12 +241,24 @@ class DGStorage:
 	##################################################
 	#以下方法无需在外部调用
 	def clche(self):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		self.optcache={};
 		self.keycache=[];
 		self.uidcache=[];
 		self.coll=[];
 
 	def createcoll(self,coll):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		os.chdir(self.database);
 		os.mkdir(str(coll));
 		os.mkdir(str(coll)+'/index');
@@ -225,6 +274,12 @@ class DGStorage:
 		indexr.close();
 		
 	def removecoll(self,coll):
+		import os;
+		import sys;
+		import codecs;
+		import uuid;
+		import urllib.parse;
+		
 		os.chdir(self.database);
 		os.remove(self.database+'/'+str(coll)+'/index/index.dgc');
 		os.rmdir(self.database+'/'+str(coll)+'/index');
