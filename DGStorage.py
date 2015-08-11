@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 __author__='DGideas';
 #Release:Dorado
-
+import os;
+import sys;
 try:
 	os.chdir(os.path.dirname(sys.argv[0]));
 except FileNotFoundError:
