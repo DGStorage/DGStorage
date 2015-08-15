@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 __author__='DGideas';
 #Release:dreamspark
-#Thanks Boxfish Education for support
 import os;
 import sys;
 try:
@@ -17,10 +16,12 @@ class DGStorage:
 		self.DGSTORAGE_CHARSET='utf8';
 		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
 		self.DGSTORAGE_SEARCHRANGE=3;
+		self.DGSTORAGE_SEARCHINDEXLIMIT=256;
 				
 		self.Location='';
 		self.CollectionCache=[];
 		self.LastCollection='';
+		self.SearchCache=[];
 	
 	def create(self,name):
 		import codecs;
@@ -41,7 +42,8 @@ class DGStorage:
 			os.mkdir(self.Location+'/index');
 			with codecs.open(self.Location+'/index/index.dgi','a',self.DGSTORAGE_CHARSET) as index:
 				pass;
-			os.mkdir(self.Location+'/cache')
+			os.mkdir(self.Location+'/cache');
+			os.mkdir(self.Location+'/cache/search');
 			return True;
 		else:
 			return False;
@@ -73,13 +75,16 @@ class DGStorage:
 						self.CollectionCache.append(line);
 			return len(CollectionCache);
 	
+	def append(self,content):
+		import uuid;
+		return self.add(str(uuid.uuid1()),content,{"method":"append"});
+	
 	def add(self,key,content,prop={}):
 		import codecs;
 		import uuid;
 		import urllib.parse;
 		import os;
 		import sys;
-		
 		key=str(key).replace('\n','');
 		key=urllib.parse.quote_plus(str(key));
 		operationCollection=''
@@ -125,11 +130,18 @@ class DGStorage:
 					storageProp.write(str(propItem)+':'+str(prop[propItem])+'\n');
 		return uid;
 	
-	def get(self,key,limit=-1):
+	def index(self,key):
+		return self.get(key);
+	
+	def get(self,key,limit=None,skip=0):
 		if limit==0:
 			return False;
-		
-		
+		if limit==None:
+			return self.finditemviakey(key)[skip:];
+		elif limit>0:
+			return self.finditemviakey(key)[skip:int(limit)];
+		else:
+			return False;
 	
 	#Private
 	def clche(self,where=''):
@@ -176,3 +188,17 @@ class DGStorage:
 		else:
 			return False;
 	
+	def finditemviakey(self,key):
+		import urllib.parse;
+		key=str(urllib.parse.quote_plus(str(key)));
+		res={};
+		for collection in self.CollectionCache:
+			with open(str(collection)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='' or line!='\n':
+						split=line.split(',');
+						if split[1]==key:
+							with open(str(collection)+'/'+split[0]+'.dgs') as storage:
+								res.append(storage.read());
+		return res;
