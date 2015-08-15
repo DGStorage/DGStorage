@@ -1,5 +1,5 @@
-# DGStorage - 对于效率毫不妥协的数据驱动程序
-**我们已经重写了整个DGStorage库，使它更有效率地处理更大的数据，存储逻辑也发生了改变**
+# DGStorage - Efficiency Without Compromise
+**We've rewritten the entire library，使它更有效率地处理更大的数据，存储逻辑也发生了改变**
 
 DGStorage 是一个极其适合于存储非结构化数据的快速数据库。
 使用时，只需引用DGStorage库即可。

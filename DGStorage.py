@@ -73,7 +73,7 @@ class DGStorage:
 					line=line.replace('\n','');
 					if line!='' and line!='\n':
 						self.CollectionCache.append(line);
-			return len(CollectionCache);
+			return len(self.CollectionCache);
 	
 	def append(self,content):
 		import uuid;
@@ -191,7 +191,7 @@ class DGStorage:
 	def finditemviakey(self,key):
 		import urllib.parse;
 		key=str(urllib.parse.quote_plus(str(key)));
-		res={};
+		res=[];
 		for collection in self.CollectionCache:
 			with open(str(collection)+'/index/index.dgi') as collIndex:
 				for line in collIndex:
@@ -200,5 +200,5 @@ class DGStorage:
 						split=line.split(',');
 						if split[1]==key:
 							with open(str(collection)+'/'+split[0]+'.dgs') as storage:
-								res.append(storage.read());
+								res.append({str(split[0]):storage.read()});
 		return res;
