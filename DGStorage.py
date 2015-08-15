@@ -28,7 +28,6 @@ class DGStorage:
 		import uuid;
 		import urllib.parse;
 		import os;
-		import sys;
 		
 		name=urllib.parse.quote_plus(str(name));
 		try:
@@ -44,16 +43,14 @@ class DGStorage:
 				pass;
 			os.mkdir(self.Location+'/cache');
 			os.mkdir(self.Location+'/cache/search');
+			os.mkdir(self.Location+'/cache/prop');
 			return True;
 		else:
 			return False;
 	
 	def select(self,name):
-		import codecs;
-		import uuid;
 		import urllib.parse;
 		import os;
-		import sys;
 		name=urllib.parse.quote_plus(str(name));
 		try:
 			os.chdir(str(name));
@@ -72,7 +69,7 @@ class DGStorage:
 				for line in index:
 					line=line.replace('\n','');
 					if line!='' and line!='\n':
-						self.CollectionCache.append(line);
+						self.CollectionCache.append(str(line));
 			return len(self.CollectionCache);
 	
 	def append(self,content):
@@ -83,8 +80,6 @@ class DGStorage:
 		import codecs;
 		import uuid;
 		import urllib.parse;
-		import os;
-		import sys;
 		key=str(key).replace('\n','');
 		key=urllib.parse.quote_plus(str(key));
 		operationCollection=''
@@ -133,6 +128,9 @@ class DGStorage:
 	def index(self,key):
 		return self.get(key);
 	
+	def count(self,key):
+		return len(self.get(key));
+	
 	def get(self,key,limit=None,skip=0):
 		if limit==0:
 			return False;
@@ -142,6 +140,47 @@ class DGStorage:
 			return self.finditemviakey(key)[skip:int(limit)];
 		else:
 			return False;
+	
+	def remove(self,uid):
+		import os;
+		import codecs;
+		with open('index/index.dgi') as index:
+			findStatus=False;
+			for line in index:
+				line=line.replace('\n','');
+				itemList=[];
+				with open(str(line)+'/index/index.dgi') as collIndex:
+					for row in collIndex:
+						row=row.replace('\n','');
+						split=row.split(',');
+						if split[0]==uid:
+							os.remove(str(line)+'/'+str(uid)+'.dgs');
+							try:
+								os.remove(str(line)+'/'+str(uid)+'.dgp');
+							except FileNotFoundError:
+								pass;
+							findStatus=True;
+						else:
+							itemList.append(row);
+				if findStatus==True:
+					with codecs.open(str(line)+'/index/index.dgi','w','utf8') as collIndex:
+						string=''
+						for item in itemList:
+							string=str(string)+str(item)+'\n';
+						collIndex.write(string);
+					i=0;
+					with open(str(line)+'/index/index.dgi') as collIndex:
+						
+						for line in collIndex:
+							line=line.replace('\n','');
+							if line!='':
+								i+=1;
+					if i==0:
+						self.removecoll(str(line));
+					break;
+			if findStatus==False:
+				return False;
+		return True;
 	
 	#Private
 	def clche(self,where=''):
@@ -159,13 +198,29 @@ class DGStorage:
 			os.mkdir(str(coll)+'/index');
 			with codecs.open(str(coll)+'/index/index.dgi','a','utf8') as dgc:
 				pass;
-			self.CollectionCache.append(coll);
+			self.CollectionCache.append(str(coll));
 			with open('index/index.dgi','a') as index:
 				index.write(str(coll)+'\n');
 			return True;
 	
 	def removecoll(self,coll):
-		return;
+		import codecs;
+		import os;
+		os.remove(str(coll)+'/index/index.dgi');
+		os.rmdir(str(coll)+'/index');
+		os.rmdir(str(coll));
+		self.CollectionCache.remove(str(coll));
+		collCache=[];
+		with open('index/index.dgi') as index:
+			for line in index:
+				line=str(line.replace('\n',''));
+				if line!=str(coll):
+					collCache.append(line);
+		with codecs.open('index/index.dgi','w','utf8') as index:
+			if len(collCache)!=0:
+				for collection in collCache:
+					index.write(str(collection)+'\n');
+		return True;
 	
 	def findavailablecoll(self,createNewColl=False):
 		searchRange=self.DGSTORAGE_SEARCHRANGE;
