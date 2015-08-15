@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 __author__='DGideas';
-#Release:Dorado
+#Release:dreamspark
+#Thanks Boxfish Education for support
 import os;
 import sys;
 try:
@@ -12,277 +13,136 @@ except OSError:
 
 class DGStorage:
 	def __init__(self):
-		import os;
-		import sys;
+		self.DGSTORAGE_VERSION='2.0';
+		self.DGSTORAGE_CHARSET='utf8';
+		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
+		
+		self.Location='';
+		self.CollectionCache=[];
+	
+	def create(self,name):
 		import codecs;
 		import uuid;
 		import urllib.parse;
-		
-		self.query=[];
-		self.database='';
-		self.conf={};
-		self.coll=[];
-		self.optcache={};
-		self.keycache=[];
-		self.LTkeycache=[]; #键值长期缓存
-		self.uidcache=[];
-		
-	def selectdb(self,database):
 		import os;
 		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
 		
+		name=urllib.parse.quote_plus(str(name));
 		try:
-			open(database+'/conf.dgb','r');
+			os.chdir(str(name));
 		except FileNotFoundError:
-			return False;
-		else:
-			with codecs.open(database+'/conf.dgb','r','utf8') as conf:
-				for line in conf.readlines():
-					config=line.split(':');
-					self.conf[config[0]]=config[1];
-				self.database=database;
-		return True;
-
-	def createdb(self,database):
-		import os;
-		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
-		
-		try:
-			open(database+'/conf.dgb','r');
-		except FileNotFoundError:
-			with codecs.open(database+'/conf.dgb','a','utf8') as conf:
-				os.chdir(database);
-				self.database=database
-				os.mkdir('index');
-				self.createcoll(0);
-				conf.write('databaseid:'+str(uuid.uuid1()));
-				conf.write('\ndatabaseversion:1.0');
+			os.mkdir(str(name));
+			self.Location=name;
+			with codecs.open('conf.dgb','a',self.DGSTORAGE_CHARSET) as conf:
+				conf.write(uuid.uuid1()+'\n');
+				conf.write('version:'+self.DGSTORAGE_VERSION);
+			os.mkdir('index');
+			with codecs.open(self.Location+'/index.dgi','a',self.DGSTORAGE_CHARSET) as index:
+				pass;
 			return True;
 		else:
 			return False;
-
-	def add(self,key,content):
-		import os;
-		import sys;
+	
+	def select(self,name):
 		import codecs;
 		import uuid;
 		import urllib.parse;
-		
-		self.clche();
-		key=urllib.parse.quote_plus(key);
+		import os;
+		import sys;
+		name=urllib.parse.quote_plus(str(name));
 		try:
-			codecs.open(self.database+'/index/index.dgi','r','utf8');
+			os.chdir(str(name));
 		except FileNotFoundError:
 			return False;
 		else:
-			with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
-				for line in index.readlines():
-					line=line.replace('\n',''); #去除换行符
-					self.coll.append(str(line));
-				for collection in self.coll:
-					try:
-						self.optcache['coll'];
-					except KeyError:
-						try:
-							codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8');
-						except FileNotFoundError:
-							return False;
-						else:
-							with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindex:
-								if len(docindex.readlines())<1024:
-									self.optcache['coll']=collection; #目的集合选择器
-					else:
-						pass;
-					with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindex:
-						r=docindex.readlines();
-						if len(r)==0:
-							continue;
-						else:
-							if r[0].split(',')[1] not in self.LTkeycache: #长期缓存机制
-								for line in docindex.readlines():
-									self.keycache.append(line.split(',')[1]);
-									self.LTkeycache.append(line.split(',')[1]);
-				if key not in self.LTkeycache:
-					try:
-						self.optcache['coll'];
-					except KeyError:
-						self.LTkeycache.append(key);
-						addcollid=int(self.coll[-1])+1;
-						self.createcoll(addcollid);
-						self.optcache['coll']=str(addcollid);
-						uid=uuid.uuid1();
-						with codecs.open(self.database+'/'+self.optcache['coll']+'/index/index.dgc','a','utf8') as docindex:
-							with codecs.open(self.database+'/'+self.optcache['coll']+'/index/index.dgc','r','utf8') as docindexr:
-								data=codecs.open(self.database+'/'+self.optcache['coll']+'/'+str(uid)+'.dgs','w','utf8');
-								if len(docindexr.readlines())==0:
-									docindex.write(str(uid)+','+key);
-								else:
-									docindex.write('\n'+str(uid)+','+key);
-								data.write(content);
-								return True;
-					else:
-						self.LTkeycache.append(key);
-						uid=uuid.uuid1();
-						with codecs.open(self.database+'/'+self.optcache['coll']+'/index/index.dgc','a','utf8') as docindex:
-							with codecs.open(self.database+'/'+self.optcache['coll']+'/index/index.dgc','r','utf8') as docindexr:
-								data=codecs.open(self.database+'/'+self.optcache['coll']+'/'+str(uid)+'.dgs','w','utf8');
-								if len(docindexr.readlines())==0:
-									docindex.write(str(uid)+','+key);
-								else:
-									docindex.write('\n'+str(uid)+','+key);
-								data.write(content);
-								#垃圾回收
-								index.close();
-								docindex.close();
-								docindexr.close();
-								data.close();
-								return True;
-				else:
+			self.Location=name;
+			with open('conf.dgb') as conf:
+				correctVersion=False;
+				for line in conf:
+					if line.find('version:2')!=-1:
+						correctVersion=True;
+				if correctVersion==False:
 					return False;
-
-	def get(self,key):
-		import os;
-		import sys;
+			with open(self.Location+'/index.dgi') as index:
+				for line in index:
+					line=line.replace('\n','');
+					if line!='' and line!='\n':
+						self.CollectionCache.append(line);
+			return True;
+	
+	def add(self,key,content,prop={}):
 		import codecs;
 		import uuid;
 		import urllib.parse;
-		
-		self.clche();
-		key=urllib.parse.quote_plus(key);
-		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
-			for line in index.readlines():
-				line=line.replace('\n',''); #去除换行符
-				self.coll.append(str(line));
-			for collection in self.coll:
-				with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindex:
-					for line in docindex.readlines():
-						line=line.replace('\n','');
-						linesplit=line.split(',');
-						if key==linesplit[1]:
-							with codecs.open(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs','r','utf8') as cont:
-								return cont.read();
-		return False;
-				
-	def put(self,key,content):
 		import os;
 		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
 		
-		self.clche();
-		key=urllib.parse.quote_plus(key);
-		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
-			for line in index.readlines():
-				line=line.replace('\n',''); #去除换行符
-				self.coll.append(str(line));
-			for collection in self.coll:
-				with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindex:
-					for line in docindex.readlines():
-						line=line.replace('\n','');
-						linesplit=line.split(',');
-						if key==linesplit[1]:
-							with codecs.open(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs','w','utf8') as cont:
-								cont.write(content);
-								return True;
-		return False;
-		
-	def remove(self,key):
-		import os;
-		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
-		
-		self.clche();
-		key=urllib.parse.quote_plus(key);
-		with codecs.open(self.database+'/index/index.dgi','r','utf8') as index:
-			for line in index.readlines():
-				line=line.replace('\n',''); #去除换行符
-				self.coll.append(str(line));
-			for collection in self.coll:
-				with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindex:
-					for line in docindex.readlines():
-						line=line.replace('\n','');
-						linesplit=line.split(',');
-						if key==linesplit[1]:
-							os.remove(self.database+'/'+collection+'/'+str(linesplit[0])+'.dgs');
-							with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as docindexr:
-								for record in docindexr.readlines():
-									record=record.replace('\n','');
-									record=record.split(',');
-									if record[1]==key:
-										pass;
-									else:
-										self.keycache.append(record[1]);
-										self.uidcache.append(record[0]);
-								i=1;
-								with codecs.open(self.database+'/'+collection+'/index/index.dgc','w','utf8') as indexb:
-									indexb.write('');
-									while i<=len(self.uidcache):
-										with codecs.open(self.database+'/'+collection+'/index/index.dgc','a','utf8') as indexc:
-											with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as indexr:
-												if len(indexr.readlines())==0:
-													indexc.write(str(self.uidcache[i-1])+','+str(self.keycache[i-1]));
-												else:
-													indexc.write('\n'+str(self.uidcache[i-1])+','+str(self.keycache[i-1]));
-												i=i+1;
-									with codecs.open(self.database+'/'+collection+'/index/index.dgc','r','utf8') as dgcfile:
-										if (dgcfile.readlines())==[]:
-											self.removecoll(collection);
-									return True;
-		return False;
-
-	##################################################
-	#以下方法无需在外部调用
-	def clche(self):
-		import os;
-		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
-		
-		self.optcache={};
-		self.keycache=[];
-		self.uidcache=[];
-		self.coll=[];
-
-	def createcoll(self,coll):
-		import os;
-		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
-		
-		os.chdir(self.database);
-		os.mkdir(str(coll));
-		os.mkdir(str(coll)+'/index');
-		collindex=codecs.open(self.database+'/'+str(coll)+'/index/index.dgc','a','utf8');
-		index=codecs.open(self.database+'/index/index.dgi','a','utf8');
-		indexr=codecs.open(self.database+'/index/index.dgi','r','utf8');
-		if len(indexr.readlines())==0:
-			index.write(str(coll));
+		key.replace('\n','');
+		key=urllib.parse.quote_plus(str(key));
+		operationCollection=''
+		if key=='':
+			return False;
+		if len(self.CollectionCache)==0:
+			if (self.createcoll(0)):
+				operationCollection=0;
+			else:
+				return False;
 		else:
-			index.write('\n'+str(coll));
-		#垃圾回收
-		index.close();
-		indexr.close();
-		
-	def removecoll(self,coll):
-		import os;
-		import sys;
-		import codecs;
-		import uuid;
-		import urllib.parse;
-		
-		os.chdir(self.database);
-		os.remove(self.database+'/'+str(coll)+'/index/index.dgc');
-		os.rmdir(self.database+'/'+str(coll)+'/index');
-		os.rmdir(self.database+'/'+str(coll));
+			lastCollection='';
+			for collection in self.CollectionCache:
+				lastCollection=collection;
+				with open(self.Location+'/'+str(collection)+'/index/index.dgc') as collIndex:
+					i=0;
+					for line in collIndex:
+						if line!='':
+							i+=1;
+					if i<self.DGSTORAGE_SINGLECOLLECTIONLIMIT:
+						operationCollection=collection;
+						break;
+					else:
+						continue;
+			if operationCollection=='':
+				self.createcoll(int(lastCollection)+1);
+				operationCollection=int(lastCollection)+1;
+		uid='';
+		with codecs.open(self.Location+'/'+str(operationCollection)+'/index/index.dgc','a','utf8') as collindex:
+			collindexR=open(self.Location+'/'+str(operationCollection)+'/index/index.dgc');
+			i=0;
+			for line in collindexR:
+				if line!='' and line!='\n':
+					i+=1;
+			collindexR.close();
+			uid=uuid.uuid1();
+			if i==0:
+				collindex.write(str(uid));
+			else:
+				collindex.write('\n'+str(uid));
+		with codecs.open(self.Location+'/'+str(operationCollection)+'/'+str(uid)+'.dgs','a','utf8') as storage:
+			storage.write(content);
+		with codecs.open(self.Location+'/'+str(operationCollection)+'/'+str(uid)+'.dgp','a','utf8') as storageProp:
+			for propItem in prop:
+				storageProp.write(str(propItem)+'\n');
 		return True;
+					
+	
+	#Private
+	def clche(self,where=''):
+		if where='':
+			self.CollectionCache=[];
+	
+	def createcoll(self,coll):
+		try:
+			os.mkdir(str(coll));
+		except FileExistsError:
+			return False;
+		else:
+			os.mkdir(str(coll)+'/index');
+			with codecs.open(str(coll)+'/index/index.dgc','a','utf8') as dgc:
+				pass;
+			self.CollectionCache.append(coll);
+			with open(self.Location+'/index/index.dgi','a') as index:
+				index.write(coll+'\n');
+			return True;
+	
+	def removecoll(self,coll):
+		
