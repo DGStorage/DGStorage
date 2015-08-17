@@ -136,14 +136,7 @@ class DGStorage:
 		return self.finditemviakey(key,limit,skip);
 	
 	def fetch(self,limit=5,skip=0):
-		if limit==0:
-			return False;
-		elif limit==-1:
-			pass;
-		elif limit>0:
-			pass;
-		else:
-			return False;
+		return self.finditemviakey('$all',limit,skip);
 	
 	def remove(self,uid):
 		import os;
@@ -371,6 +364,18 @@ class DGStorageShell(DGStorage):
 			string=str(string)+str(item['uid'])+','+str(item['content'])+','+str(item['prop'])+'\n';
 		f.write(string);
 		f.close();
+	
+	def shellFetch(self,limit,skip,outFileLocation):
+		import codecs;
+		import urllib.parse;
+		res=self.fetch(limit,skip);
+		f=codecs.open(outFileLocation,'w','utf8');
+		string='';
+		for item in res:
+			item['content']=urllib.parse.quote_plus(item['content']);
+			string=str(string)+str(item['uid'])+','+str(item['content'])+','+str(item['prop'])+'\n';
+		f.write(string);
+		f.close();
 
 if __name__ == '__main__':
 	try:
@@ -398,3 +403,13 @@ if __name__ == '__main__':
 				shellHandle.select(str(sys.argv[2]));
 				if sys.argv[4].find('/')==-1:
 					shellHandle.shellGet(str(sys.argv[3]),'../'+str(sys.argv[4]));
+		if sys.argv[1]=='fetch':
+			try:
+				sys.argv[5];
+			except IndexError:
+				pass;
+			else:
+				shellHandle=DGStorageShell();
+				shellHandle.select(str(sys.argv[2]));
+				if sys.argv[5].find('/')==-1:
+					shellHandle.shellFetch(str(sys.argv[3]),str(sys.argv[4]),'../'+str(sys.argv[5]));
