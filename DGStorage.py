@@ -362,10 +362,12 @@ class DGStorageShell(DGStorage):
 	
 	def shellGet(self,key,outFileLocation):
 		import codecs;
+		import urllib.parse;
 		res=self.get(key);
 		f=codecs.open(outFileLocation,'w','utf8');
 		string='';
 		for item in res:
+			item['content']=urllib.parse.quote_plus(item['content']);
 			string=str(string)+str(item['uid'])+','+str(item['content'])+','+str(item['prop'])+'\n';
 		f.write(string);
 		f.close();
