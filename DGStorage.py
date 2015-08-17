@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 __author__='DGideas';
 #Release:dreamspark
+#This is a free software with the help of Boxfish Education.
 import os;
 import sys;
 try:
@@ -22,13 +23,12 @@ class DGStorage:
 		self.CollectionCache=[];
 		self.LastCollection='';
 		self.SearchCache=[];
-	
+
 	def create(self,name):
 		import codecs;
 		import uuid;
 		import urllib.parse;
 		import os;
-		
 		name=urllib.parse.quote_plus(str(name));
 		try:
 			os.chdir(str(name));
@@ -131,13 +131,16 @@ class DGStorage:
 	def count(self,key):
 		return len(self.get(key));
 	
-	def get(self,key,limit=None,skip=0):
+	def get(self,key,limit=-1,skip=0):
+		return self.finditemviakey(key,limit,skip);
+	
+	def fetch(self,limit=5,skip=0):
 		if limit==0:
 			return False;
-		if limit==None:
-			return self.finditemviakey(key)[skip:];
+		elif limit==-1:
+			pass;
 		elif limit>0:
-			return self.finditemviakey(key)[skip:int(limit)];
+			pass;
 		else:
 			return False;
 	
@@ -170,7 +173,6 @@ class DGStorage:
 						collIndex.write(string);
 					i=0;
 					with open(str(line)+'/index/index.dgi') as collIndex:
-						
 						for line in collIndex:
 							line=line.replace('\n','');
 							if line!='':
@@ -243,17 +245,115 @@ class DGStorage:
 		else:
 			return False;
 	
-	def finditemviakey(self,key):
-		import urllib.parse;
-		key=str(urllib.parse.quote_plus(str(key)));
+	def finditemviakey(self,key,limit,skip):
+		limit=int(limit);
+		skip=int(skip);
+		if skip<0:
+			skip=0;
 		res=[];
-		for collection in self.CollectionCache:
-			with open(str(collection)+'/index/index.dgi') as collIndex:
-				for line in collIndex:
-					line=line.replace('\n','');
-					if line!='' or line!='\n':
-						split=line.split(',');
-						if split[1]==key:
-							with open(str(collection)+'/'+split[0]+'.dgs') as storage:
-								res.append({str(split[0]):storage.read()});
+		if limit==0:
+			return res;
+		elif limit<0 or limit==None:
+			limit=-1;
+		if key!='$all':
+			import urllib.parse;
+			key=str(urllib.parse.quote_plus(str(key)));
+		s=0;
+		i=0;
+		res=[];
+		if key=='$all':
+			for collection in self.CollectionCache:
+				with open(str(collection)+'/index/index.dgi') as collIndex:
+					for line in collIndex:
+						if s>=skip:
+							if i<=limit and limit!=-1:
+								line=line.replace('\n','');
+								if line!='':
+									split=line.split(',');
+									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+										res.append({"uid":str(split[0]),"content":str(storage.read())});
+								i+=1;
+							elif limit==-1:
+								line=line.replace('\n','');
+								if line!='':
+									split=line.split(',');
+									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+										res.append({"uid":str(split[0]),"content":str(storage.read())});
+								i+=1;
+							else:
+								break;
+						else:
+							s+=1;
+		else:
+			for collection in self.CollectionCache:
+				with open(str(collection)+'/index/index.dgi') as collIndex:
+					for line in collIndex:
+						if s>=skip:
+							if i<=limit and limit!=-1:
+								line=line.replace('\n','');
+								if line!='':
+									split=line.split(',');
+									if split[1]==key:
+										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+											res.append({"uid":str(split[0]),"content":str(storage.read())});
+								i+=1;
+							elif limit==-1:
+								line=line.replace('\n','');
+								if line!='':
+									split=line.split(',');
+									if split[1]==key:
+										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+											res.append({"uid":str(split[0]),"content":str(storage.read())});
+								i+=1;
+							else:
+								break;
+						else:
+							s+=1;
 		return res;
+	
+class DGStorageShell(DGStorage):
+	def shellAdd(self,key,inFileLocation):
+		import codecs;
+		with codecs.open(inFileLocation,'r','utf8') as f:
+			string='';
+			for line in f:
+				line=line.replace('\n','');
+				string=str(string)+str(line);
+				self.add(key,string);
+	
+	def shellGet(self,key,outFileLocation):
+		import codecs;
+		res=self.get(key);
+		f=codecs.open(outFileLocation,'w','utf8');
+		string='';
+		for item in res:
+			string=str(string)+str(item['uid'])+','+str(item['content'])+'\n';
+		f.write(string);
+		f.close();
+
+if __name__ == '__main__':
+	try:
+		sys.argv[1];
+	except IndexError:
+		pass;
+	else:
+		if sys.argv[1]=='add':
+			try:
+				sys.argv[4];
+			except IndexError:
+				pass;
+			else:
+				shellHandle=DGStorageShell();
+				shellHandle.select(str(sys.argv[2]));
+				if sys.argv[4].find('/')==-1:
+					shellHandle.shellAdd(str(sys.argv[3]),'../'+str(sys.argv[4]));
+		if sys.argv[1]=='get':
+			try:
+				sys.argv[4];
+			except IndexError:
+				pass;
+			else:
+				shellHandle=DGStorageShell();
+				shellHandle.select(str(sys.argv[2]));
+				if sys.argv[4].find('/')==-1:
+					shellHandle.shellGet(str(sys.argv[3]),'../'+str(sys.argv[4]));
