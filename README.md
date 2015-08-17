@@ -19,10 +19,10 @@ DGStorage 是一个极其适合于存储非结构化数据的快速数据库。
     
 3.在已有文件夹的基础上创建数据库实例,或者选择一个已有的数据库实例：
     
-    a.create('/dev/null')
-    a.select('/root/shutdown')
+    a.create('db')
+    a.select('db')
     
 4.尽情使用吧！
     
-    a.add('20870901','Hello, Future!')
-    a.get('20900101')
+    a.add('20150101','Hello, Future!')
+    a.get('20150101')

@@ -17,7 +17,7 @@ class DGStorage:
 		self.DGSTORAGE_CHARSET='utf8';
 		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
 		self.DGSTORAGE_SEARCHRANGE=3;
-		self.DGSTORAGE_SEARCHINDEXLIMIT=256;
+		self.DGSTORAGE_SEARCHINDEXLIMIT=128;
 				
 		self.Location='';
 		self.CollectionCache=[];
@@ -122,6 +122,7 @@ class DGStorage:
 		if len(prop)!=0:
 			with codecs.open(str(operationCollection)+'/'+str(uid)+'.dgp','a','utf8') as storageProp:
 				for propItem in prop:
+					prop[propItem]=urllib.parse.quote_plus(str(prop[propItem]));
 					storageProp.write(str(propItem)+':'+str(prop[propItem])+'\n');
 		return uid;
 	
@@ -271,14 +272,16 @@ class DGStorage:
 								if line!='':
 									split=line.split(',');
 									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
-										res.append({"uid":str(split[0]),"content":str(storage.read())});
+										prop=self.getprop(split[0],collection);
+										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							elif limit==-1:
 								line=line.replace('\n','');
 								if line!='':
 									split=line.split(',');
 									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
-										res.append({"uid":str(split[0]),"content":str(storage.read())});
+										prop=self.getprop(split[0],collection);
+										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							else:
 								break;
@@ -295,7 +298,8 @@ class DGStorage:
 									split=line.split(',');
 									if split[1]==key:
 										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
-											res.append({"uid":str(split[0]),"content":str(storage.read())});
+											prop=self.getprop(split[0],collection);
+											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							elif limit==-1:
 								line=line.replace('\n','');
@@ -303,13 +307,48 @@ class DGStorage:
 									split=line.split(',');
 									if split[1]==key:
 										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
-											res.append({"uid":str(split[0]),"content":str(storage.read())});
+											prop=self.getprop(split[0],collection);
+											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							else:
 								break;
 						else:
 							s+=1;
 		return res;
+	
+	def getprop(self,uid,coll=None):
+		import codecs;
+		import urllib.parse;
+		res={};
+		if coll==None:
+			for collection in CollectionCache:
+				try:
+					open(str(collection)+'/'+str(uid)+'.dgp');
+				except FileNotFoundError:
+					return res;
+				else:
+					f=codecs.open(str(collection)+'/'+str(uid)+'.dgp');
+					for line in f:
+						line=line.replace('\n','');
+						if line!='':
+							split=line.split(':');
+							split[1]=urllib.parse.unquote_plus(str(split[1]));
+							res[split[0]]=split[1];
+					return res;
+		else:
+			try:
+				open(str(coll)+'/'+str(uid)+'.dgp');
+			except FileNotFoundError:
+				return res;
+			else:
+				f=codecs.open(str(coll)+'/'+str(uid)+'.dgp','r','utf8');
+				for line in f:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(':');
+						split[1]=urllib.parse.unquote_plus(str(split[1]));
+						res[split[0]]=split[1];
+				return res;
 	
 class DGStorageShell(DGStorage):
 	def shellAdd(self,key,inFileLocation):
@@ -327,7 +366,7 @@ class DGStorageShell(DGStorage):
 		f=codecs.open(outFileLocation,'w','utf8');
 		string='';
 		for item in res:
-			string=str(string)+str(item['uid'])+','+str(item['content'])+'\n';
+			string=str(string)+str(item['uid'])+','+str(item['content'])+','+str(item['prop'])+'\n';
 		f.write(string);
 		f.close();
 
