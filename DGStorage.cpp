@@ -1,0 +1,4 @@
+#include<stdin>
+int main()
+{
+}
