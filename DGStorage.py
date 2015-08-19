@@ -122,6 +122,7 @@ class DGStorage:
 		if len(prop)!=0:
 			with codecs.open(str(operationCollection)+'/'+str(uid)+'.dgp','a','utf8') as storageProp:
 				for propItem in prop:
+					propItem=urllib.parse.quote_plus(str(propItem));
 					prop[propItem]=urllib.parse.quote_plus(str(prop[propItem]));
 					storageProp.write(str(propItem)+':'+str(prop[propItem])+'\n');
 		return uid;
@@ -325,6 +326,7 @@ class DGStorage:
 						line=line.replace('\n','');
 						if line!='':
 							split=line.split(':');
+							split[0]=urllib.parse.unquote_plus(str(split[0]));
 							split[1]=urllib.parse.unquote_plus(str(split[1]));
 							res[split[0]]=split[1];
 					return res;
@@ -339,6 +341,7 @@ class DGStorage:
 					line=line.replace('\n','');
 					if line!='':
 						split=line.split(':');
+						split[0]=urllib.parse.unquote_plus(str(split[0]));
 						split[1]=urllib.parse.unquote_plus(str(split[1]));
 						res[split[0]]=split[1];
 				return res;
