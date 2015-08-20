@@ -14,6 +14,7 @@ class DGStorage:
 		self.DGSTORAGE_SEARCHRANGE=3; # Determine when find a avalible collection, how many collection can we find. None stands find all collection.
 		self.DGSTORAGE_SEARCHINDEXLIMIT=64; # Determine DGStorage can storage how many indexs for quick search.
 		self.DGSTORAGE_SEARCHCACHELIMIT=32; # Determine DGStorage can storage how many caches for quick responds.
+		self.DGSTORAGE_SAFETY=True; # Security settings, True not allowed access database out of the exec path.
 		
 		self.DGSTORAGE_Name=None;
 		
@@ -34,7 +35,8 @@ class DGStorage:
 		import urllib.parse;
 		import os;
 		self.DGSTORAGE_Name=str(name);
-		self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
+		if self.DGSTORAGE_SAFETY==True:
+			self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
 		try:
 			os.mkdir(self.DGSTORAGE_Name);
 		except FileExistsError:
@@ -57,7 +59,8 @@ class DGStorage:
 		import urllib.parse;
 		import os;
 		self.DGSTORAGE_Name=str(name);
-		self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
+		if self.DGSTORAGE_SAFETY==True:
+			self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
 		try:
 			os.mkdir(self.DGSTORAGE_Name);
 		except FileExistsError:
