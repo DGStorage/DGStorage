@@ -1,5 +1,5 @@
 <?php
-	function DGContent($action=fetch,$datacluster=db,$value="",$outfile="out.php")
+	function DGContent($action="fetch",$datacluster="db",$value="",$outfile="out.php")
 	{
 		exec("python DGStorage.py".$action." ".$datacluster." ".$value." ".$outfile);
 		$res=file_get_contents($outfile);
@@ -10,7 +10,7 @@
 			return urldecode($array[1]);
 		}
 	}
-    function DGProp($action=fetch,$datacluster=db,$value="",$outfile="out.php")
+    function DGProp($action="fetch",$datacluster="db",$value="",$outfile="out.php")
 	{
 		exec("python DGStorage.py".$action." ".$datacluster." ".$value." ".$outfile);
 		$res=file_get_contents($outfile);
