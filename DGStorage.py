@@ -38,7 +38,8 @@ class DGStorage:
 		try:
 			os.mkdir(self.DGSTORAGE_Name);
 		except FileExistsError:
-			os.mkdir(self.DGSTORAGE_Name);
+			return False;
+		else:
 			self.DGSTORAGE_Name=self.DGSTORAGE_Name;
 			self.DGSTORAGE_Name=name;
 			with codecs.open(self.DGSTORAGE_Name+'/conf.dgb','a',self.DGSTORAGE_CHARSET) as conf:
@@ -51,14 +52,12 @@ class DGStorage:
 			os.mkdir(self.DGSTORAGE_Name+'/cache/search');
 			os.mkdir(self.DGSTORAGE_Name+'/cache/prop');
 			return True;
-		else:
-			return False;
 	
 	def select(self,name):
 		import urllib.parse;
 		import os;
 		self.DGSTORAGE_Name=str(name);
-		self.DGSTORAGE_Name+'/'+=urllib.parse.quote_plus(self.DGSTORAGE_Name);
+		self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
 		try:
 			os.mkdir(self.DGSTORAGE_Name);
 		except FileExistsError:
