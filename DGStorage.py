@@ -1,49 +1,55 @@
 #!/usr/bin/env python3
 __author__='DGideas';
-#Release:dreamspark
+#Release:razespark
 #This is a free software with the help of Boxfish Education.
-import os;
-import sys;
-try:
-	os.chdir(os.path.dirname(sys.argv[0]));
-except FileNotFoundError:
-	pass;
-except OSError:
-	pass;
 
 class DGStorage:
 	def __init__(self,conf={}):
-		self.DGSTORAGE_VERSION='2.0';
-		self.DGSTORAGE_CHARSET='utf8';
-		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
-		self.DGSTORAGE_SEARCHRANGE=3;
-		self.DGSTORAGE_SEARCHINDEXLIMIT=128;
-				
-		self.Location='';
+		import os;
+		import sys;
+		
+		self.DGSTORAGE_VERSION='2.1'; # DataCollection Version
+		self.DGSTORAGE_CHARSET='utf8'; # Default Charset
+		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024; # Determine every collection can put how many datas
+		self.DGSTORAGE_SEARCHRANGE=3; # Determine when find a avalible collection, how many collection can we find. None stands find all collection.
+		self.DGSTORAGE_SEARCHINDEXLIMIT=64; # Determine DGStorage can storage how many indexs for quick search.
+		self.DGSTORAGE_SEARCHCACHELIMIT=32; # Determine DGStorage can storage how many caches for quick responds.
+		
+		self.DGSTORAGE_Name=None;
+		
 		self.CollectionCache=[];
 		self.LastCollection='';
 		self.SearchCache=[];
+		
+		try:
+			os.chdir(os.path.dirname(sys.argv[0]));
+		except FileNotFoundError:
+			pass;
+		except OSError:
+			pass;
 
 	def create(self,name):
 		import codecs;
 		import uuid;
 		import urllib.parse;
 		import os;
-		name=urllib.parse.quote_plus(str(name));
+		self.DGSTORAGE_Name=str(name);
+		self.DGSTORAGE_Name=urllib.parse.quote_plus(self.DGSTORAGE_Name);
 		try:
-			os.chdir(str(name));
-		except FileNotFoundError:
-			os.mkdir(str(name));
-			self.Location=name;
-			with codecs.open(self.Location+'/conf.dgb','a',self.DGSTORAGE_CHARSET) as conf:
+			os.mkdir(self.DGSTORAGE_Name);
+		except FileExistsError:
+			os.mkdir(self.DGSTORAGE_Name);
+			self.DGSTORAGE_Name=self.DGSTORAGE_Name;
+			self.DGSTORAGE_Name=name;
+			with codecs.open(self.DGSTORAGE_Name+'/conf.dgb','a',self.DGSTORAGE_CHARSET) as conf:
 				conf.write(str(uuid.uuid1())+'\n');
 				conf.write('Version:'+self.DGSTORAGE_VERSION);
-			os.mkdir(self.Location+'/index');
-			with codecs.open(self.Location+'/index/index.dgi','a',self.DGSTORAGE_CHARSET) as index:
+			os.mkdir(self.DGSTORAGE_Name+'/index');
+			with codecs.open(self.DGSTORAGE_Name+'/index/index.dgi','a',self.DGSTORAGE_CHARSET) as index:
 				pass;
-			os.mkdir(self.Location+'/cache');
-			os.mkdir(self.Location+'/cache/search');
-			os.mkdir(self.Location+'/cache/prop');
+			os.mkdir(self.DGSTORAGE_Name+'/cache');
+			os.mkdir(self.DGSTORAGE_Name+'/cache/search');
+			os.mkdir(self.DGSTORAGE_Name+'/cache/prop');
 			return True;
 		else:
 			return False;
@@ -51,26 +57,28 @@ class DGStorage:
 	def select(self,name):
 		import urllib.parse;
 		import os;
-		name=urllib.parse.quote_plus(str(name));
+		self.DGSTORAGE_Name=str(name);
+		self.DGSTORAGE_Name+'/'+=urllib.parse.quote_plus(self.DGSTORAGE_Name);
 		try:
-			os.chdir(str(name));
-		except FileNotFoundError:
-			return False;
-		else:
-			self.Location=name;
-			with open('conf.dgb') as conf:
+			os.mkdir(self.DGSTORAGE_Name);
+		except FileExistsError:
+			self.DGSTORAGE_Name=name;
+			with open(self.DGSTORAGE_Name+'/conf.dgb') as conf:
 				correctVersion=False;
 				for line in conf:
 					if line.find('Version:2')!=-1:
 						correctVersion=True;
 				if correctVersion==False:
 					return False;
-			with open('index/index.dgi') as index:
+			with open(self.DGSTORAGE_Name+'/index/index.dgi') as index:
 				for line in index:
 					line=line.replace('\n','');
-					if line!='' and line!='\n':
+					if line!='':
 						self.CollectionCache.append(str(line));
 			return len(self.CollectionCache);
+		else:
+			os.rmdir(self.DGSTORAGE_Name);
+			return False;
 	
 	def append(self,content):
 		import uuid;
@@ -92,7 +100,7 @@ class DGStorage:
 				return False;
 		else:
 			if self.LastCollection!='':
-				with open(str(self.LastCollection)+'/index/index.dgi') as collIndex:
+				with open(self.DGSTORAGE_Name+'/'+str(self.LastCollection)+'/index/index.dgi') as collIndex:
 					i=0;
 					for line in collIndex:
 						if line!='':
@@ -105,8 +113,8 @@ class DGStorage:
 				operationCollection=self.findavailablecoll(True);
 		self.LastCollection=operationCollection;
 		uid='';
-		with codecs.open(str(operationCollection)+'/index/index.dgi','a','utf8') as collIndex:
-			collIndexR=open(str(operationCollection)+'/index/index.dgi');
+		with codecs.open(self.DGSTORAGE_Name+'/'+str(operationCollection)+'/index/index.dgi','a',self.DGSTORAGE_CHARSET) as collIndex:
+			collIndexR=open(self.DGSTORAGE_Name+'/'+str(operationCollection)+'/index/index.dgi');
 			i=0;
 			for line in collIndexR:
 				if line!='' and line!='\n':
@@ -117,10 +125,10 @@ class DGStorage:
 				collIndex.write(str(uid)+','+str(key));
 			else:
 				collIndex.write('\n'+str(uid)+','+str(key));
-		with codecs.open(str(operationCollection)+'/'+str(uid)+'.dgs','a','utf8') as storage:
+		with codecs.open(self.DGSTORAGE_Name+'/'+str(operationCollection)+'/'+str(uid)+'.dgs','a',self.DGSTORAGE_CHARSET) as storage:
 			storage.write(str(content));
 		if len(prop)!=0:
-			with codecs.open(str(operationCollection)+'/'+str(uid)+'.dgp','a','utf8') as storageProp:
+			with codecs.open(self.DGSTORAGE_Name+'/'+str(operationCollection)+'/'+str(uid)+'.dgp','a',self.DGSTORAGE_CHARSET) as storageProp:
 				for propItem in prop:
 					propItem=urllib.parse.quote_plus(str(propItem));
 					prop[propItem]=urllib.parse.quote_plus(str(prop[propItem]));
@@ -142,32 +150,32 @@ class DGStorage:
 	def remove(self,uid):
 		import os;
 		import codecs;
-		with open('index/index.dgi') as index:
+		with open(self.DGSTORAGE_Name+'/index/index.dgi') as index:
 			findStatus=False;
 			for line in index:
 				line=line.replace('\n','');
 				itemList=[];
-				with open(str(line)+'/index/index.dgi') as collIndex:
+				with open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi') as collIndex:
 					for row in collIndex:
 						row=row.replace('\n','');
 						split=row.split(',');
 						if split[0]==uid:
-							os.remove(str(line)+'/'+str(uid)+'.dgs');
+							os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgs');
 							try:
-								os.remove(str(line)+'/'+str(uid)+'.dgp');
+								os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgp');
 							except FileNotFoundError:
 								pass;
 							findStatus=True;
 						else:
 							itemList.append(row);
 				if findStatus==True:
-					with codecs.open(str(line)+'/index/index.dgi','w','utf8') as collIndex:
+					with codecs.open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi','w',self.DGSTORAGE_CHARSET) as collIndex:
 						string=''
 						for item in itemList:
 							string=str(string)+str(item)+'\n';
 						collIndex.write(string);
 					i=0;
-					with open(str(line)+'/index/index.dgi') as collIndex:
+					with open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi') as collIndex:
 						for line in collIndex:
 							line=line.replace('\n','');
 							if line!='':
@@ -188,32 +196,32 @@ class DGStorage:
 		import codecs;
 		import os;
 		try:
-			os.mkdir(str(coll));
+			os.mkdir(self.DGSTORAGE_Name+'/'+str(coll));
 		except FileExistsError:
 			return False;
 		else:
-			os.mkdir(str(coll)+'/index');
-			with codecs.open(str(coll)+'/index/index.dgi','a','utf8') as dgc:
+			os.mkdir(self.DGSTORAGE_Name+'/'+str(coll)+'/index');
+			with codecs.open(self.DGSTORAGE_Name+'/'+str(coll)+'/index/index.dgi','a',self.DGSTORAGE_CHARSET) as dgc:
 				pass;
 			self.CollectionCache.append(str(coll));
-			with open('index/index.dgi','a') as index:
+			with open(self.DGSTORAGE_Name+'/index/index.dgi','a') as index:
 				index.write(str(coll)+'\n');
 			return True;
 	
 	def removecoll(self,coll):
 		import codecs;
 		import os;
-		os.remove(str(coll)+'/index/index.dgi');
-		os.rmdir(str(coll)+'/index');
-		os.rmdir(str(coll));
+		os.remove(self.DGSTORAGE_Name+'/'+str(coll)+'/index/index.dgi');
+		os.rmdir(self.DGSTORAGE_Name+'/'+str(coll)+'/index');
+		os.rmdir(self.DGSTORAGE_Name+'/'+str(coll));
 		self.CollectionCache.remove(str(coll));
 		collCache=[];
-		with open('index/index.dgi') as index:
+		with open(self.DGSTORAGE_Name+'/index/index.dgi') as index:
 			for line in index:
 				line=str(line.replace('\n',''));
 				if line!=str(coll):
 					collCache.append(line);
-		with codecs.open('index/index.dgi','w','utf8') as index:
+		with codecs.open(self.DGSTORAGE_Name+'/index/index.dgi','w',self.DGSTORAGE_CHARSET) as index:
 			if len(collCache)!=0:
 				for collection in collCache:
 					index.write(str(collection)+'\n');
@@ -224,7 +232,7 @@ class DGStorage:
 		if searchRange!='' or searchRange!=None:
 			searchRange=-1-int(searchRange);
 		for collection in self.CollectionCache[:searchRange:-1]:
-			with open(str(collection)+'/index/index.dgi') as collIndex:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
 				i=0;
 				for line in collIndex:
 					if line!='':
@@ -258,14 +266,14 @@ class DGStorage:
 		res=[];
 		if key=='$all':
 			for collection in self.CollectionCache:
-				with open(str(collection)+'/index/index.dgi') as collIndex:
+				with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
 					for line in collIndex:
 						if s>=skip:
 							if i<=limit and limit!=-1:
 								line=line.replace('\n','');
 								if line!='':
 									split=line.split(',');
-									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+									with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 										prop=self.getprop(split[0],collection);
 										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
@@ -273,7 +281,7 @@ class DGStorage:
 								line=line.replace('\n','');
 								if line!='':
 									split=line.split(',');
-									with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+									with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 										prop=self.getprop(split[0],collection);
 										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
@@ -283,7 +291,7 @@ class DGStorage:
 							s+=1;
 		else:
 			for collection in self.CollectionCache:
-				with open(str(collection)+'/index/index.dgi') as collIndex:
+				with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
 					for line in collIndex:
 						if s>=skip:
 							if i<=limit and limit!=-1:
@@ -291,7 +299,7 @@ class DGStorage:
 								if line!='':
 									split=line.split(',');
 									if split[1]==key:
-										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+										with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 											prop=self.getprop(split[0],collection);
 											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
@@ -300,7 +308,7 @@ class DGStorage:
 								if line!='':
 									split=line.split(',');
 									if split[1]==key:
-										with open(str(collection)+'/'+str(split[0])+'.dgs') as storage:
+										with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 											prop=self.getprop(split[0],collection);
 											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
 								i+=1;
@@ -317,11 +325,26 @@ class DGStorage:
 		if coll==None:
 			for collection in CollectionCache:
 				try:
-					open(str(collection)+'/'+str(uid)+'.dgp');
+					open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp');
 				except FileNotFoundError:
 					return res;
 				else:
-					f=codecs.open(str(collection)+'/'+str(uid)+'.dgp');
+					with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp') as f:
+						for line in f:
+							line=line.replace('\n','');
+							if line!='':
+								split=line.split(':');
+								split[0]=urllib.parse.unquote_plus(str(split[0]));
+								split[1]=urllib.parse.unquote_plus(str(split[1]));
+								res[split[0]]=split[1];
+						return res;
+		else:
+			try:
+				open(self.DGSTORAGE_Name+'/'+str(coll)+'/'+str(uid)+'.dgp');
+			except FileNotFoundError:
+				return res;
+			else:
+				with codecs.open(self.DGSTORAGE_Name+'/'+str(coll)+'/'+str(uid)+'.dgp','r',self.DGSTORAGE_CHARSET) as f:
 					for line in f:
 						line=line.replace('\n','');
 						if line!='':
@@ -330,26 +353,11 @@ class DGStorage:
 							split[1]=urllib.parse.unquote_plus(str(split[1]));
 							res[split[0]]=split[1];
 					return res;
-		else:
-			try:
-				open(str(coll)+'/'+str(uid)+'.dgp');
-			except FileNotFoundError:
-				return res;
-			else:
-				f=codecs.open(str(coll)+'/'+str(uid)+'.dgp','r','utf8');
-				for line in f:
-					line=line.replace('\n','');
-					if line!='':
-						split=line.split(':');
-						split[0]=urllib.parse.unquote_plus(str(split[0]));
-						split[1]=urllib.parse.unquote_plus(str(split[1]));
-						res[split[0]]=split[1];
-				return res;
-	
+
 class DGStorageShell(DGStorage):
 	def shellAdd(self,key,inFileLocation):
 		import codecs;
-		with codecs.open(inFileLocation,'r','utf8') as f:
+		with codecs.open(inFileLocation,'r',self.DGSTORAGE_CHARSET) as f:
 			string='';
 			for line in f:
 				line=line.replace('\n','');
@@ -360,7 +368,7 @@ class DGStorageShell(DGStorage):
 		import codecs;
 		import urllib.parse;
 		res=self.get(key);
-		f=codecs.open(outFileLocation,'w','utf8');
+		f=codecs.open(outFileLocation,'w',self.DGSTORAGE_CHARSET);
 		string='';
 		for item in res:
 			item['content']=urllib.parse.quote_plus(item['content']);
@@ -372,7 +380,7 @@ class DGStorageShell(DGStorage):
 		import codecs;
 		import urllib.parse;
 		res=self.fetch(limit,skip);
-		f=codecs.open(outFileLocation,'w','utf8');
+		f=codecs.open(outFileLocation,'w',self.DGSTORAGE_CHARSET);
 		string='';
 		for item in res:
 			item['content']=urllib.parse.quote_plus(item['content']);
