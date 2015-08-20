@@ -108,6 +108,28 @@
 			}
 		}
 		
+		public function add($key,$content,$prop=NULL)
+		{
+			$key=str_replace("\n","",$key);
+			$key=urlencode($key);
+			$operationCollection=NULL;
+			if($key=='')
+			{
+				return False;
+			}
+			if(array_count($GLOBALS["DGSTORAGE"]["CollectionCache"])==0)
+			{
+				if($this->createcoll(0))
+				{
+					$operationCollection=0;
+				}
+				else
+				{
+					return False;
+				}
+			}
+		}
+		
 		protected function uuid(){
 			if (function_exists('com_create_guid')){ 
 				return com_create_guid();
@@ -122,6 +144,32 @@
 						.substr($charid,20,12);
 				$uuid=strtolower($uuid);
 				return $uuid;
+			}
+		}
+		
+		protected function array_count($ary)
+		{
+			$i=0;
+			foreach($ary as &$element)
+			{
+				$i++;
+			}
+			return $i;
+		}
+		
+		protected function createcoll($coll)
+		{
+			if(!is_dir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll))
+			{
+				mkdir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll);
+				mkdir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll."/index");
+				$dgc=fopen($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll."/index/index.dgi","a");
+				fclose($dgc);
+				array_push($GLOBALS["DGSTORAGE"]["CollectionCache"],(string)$coll);
+				$index=fopen($GLOBALS["DGSTORAGE"]["Name"]."/index/index.dgi","a");
+					fwrite($index,(string)$coll."\n");
+					fclose($index);
+				return True;
 			}
 		}
 		
