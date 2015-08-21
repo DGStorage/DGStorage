@@ -1,6 +1,7 @@
 <?php
 	//Designed for PHP5
 	//Thanks for boxfish education's help
+	
 	function DGContent($action="fetch",$datacluster="db",$value="",$outfile="out.php")
 	{
 		exec("python DGStorage.py".$action." ".$datacluster." ".$value." ".$outfile);
@@ -27,8 +28,11 @@
 		}
 	}
 	
+	
 	class DGStorage
 	{	
+	
+		
 		function __construct()
 		{
 			$GLOBALS["DGSTORAGE"]=array();
@@ -75,6 +79,7 @@
 			return True;
 		}
 		
+		
 		public function select($name)
 		{
 			$GLOBALS["DGSTORAGE"]["Name"]=(string)$name;
@@ -85,14 +90,20 @@
 			if(is_dir($GLOBALS["DGSTORAGE"]["Name"]))
 			{
 				$correctVersion=False;
-				foreach(file($GLOBALS["DGSTORAGE"]["Name"]."/conf.dgb") as &$config)
+				$array=file($GLOBALS["DGSTORAGE"]["Name"]."/conf.dgb");
+				foreach($array as &$config)
 				{
-					if(strpos($config,"Version:2")==False)
+					if(strpos($config,"Version:2")!==False)
 					{
-						return False;
+						$correctVersion=True;
 					}
 				}
-				foreach(file($GLOBALS["DGSTORAGE"]["Name"]."/index/index.dgi") as &$line)
+				if($correctVersion==False)
+				{
+					return False;
+				}
+				$array=file($GLOBALS["DGSTORAGE"]["Name"]."/index/index.dgi");
+				foreach($array as &$line)
 				{
 					$line=str_replace("\n","",$line);
 					if($line!='')
@@ -107,6 +118,7 @@
 				return False;
 			}
 		}
+		
 		
 		public function add($key,$content,$prop=NULL)
 		{
@@ -130,6 +142,11 @@
 			}
 		}
 		
+		public function get($key,$limit=-1,$skip=0)
+		{
+			return $this->finditemviakey($key,$limit,$skip);
+		}
+		
 		protected function uuid(){
 			if (function_exists('com_create_guid')){ 
 				return com_create_guid();
@@ -146,6 +163,7 @@
 				return $uuid;
 			}
 		}
+		
 		
 		protected function array_count($ary)
 		{
@@ -172,6 +190,7 @@
 				return True;
 			}
 		}
+		
 		
 		protected function finditemviakey($key,$limit,$skip)
 		{
@@ -349,8 +368,13 @@
 				}
 			}
 		}
+		
+	
 	}
-	$a=new DGStorage();
-	$a->create('test');
-	$a->select('test');
+	
+	/*$a=new DGStorage();
+	//$a->create('test');
+	$a->select('ddd');
+	var_dump($a->get(15));
+	*/
 ?>
