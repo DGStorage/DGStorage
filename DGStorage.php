@@ -119,6 +119,11 @@
 			return $this->finditemviakey($key,$limit,$skip);
 		}
 		
+		public function fetch($limit=5,$skip=0)
+		{
+			return $this->finditemviakey('$all',$limit,$skip);
+		}
+		
 		protected function uuid(){
 			if (function_exists('com_create_guid')){ 
 				return com_create_guid();
