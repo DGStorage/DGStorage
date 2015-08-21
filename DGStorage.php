@@ -353,9 +353,7 @@
 								$line=str_replace("\n","",$line);
 								if($line!='')
 								{
-									$split=explode(",",$line);
-									$split[0]=urlencode((string)$split[0]);
-									$split[1]=urlencode((string)$split[1]);
+									$split=explode(":",$line);
 									$res[$split[0]]=$split[1];
 								}
 							return $res;
@@ -377,9 +375,7 @@
 							$line=str_replace("\n","",$line);
 							if($line!='')
 							{
-								$split=explode(",",$line);
-								$split[0]=urlencode((string)$split[0]);
-								$split[1]=urlencode((string)$split[1]);
+								$split=explode(":",$line);
 								$res[$split[0]]=$split[1];
 							}
 						}
