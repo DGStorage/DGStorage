@@ -369,9 +369,9 @@
 			}
 			else
 			{
-				if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp'))
+				if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/'.(string)$uid.'.dgp'))
 				{
-					$f=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+					$f=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/'.(string)$uid.'.dgp');
 						foreach($f as &$line)
 						{
 							$line=str_replace("\n","",$line);
