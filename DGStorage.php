@@ -173,6 +173,182 @@
 			}
 		}
 		
+		protected function finditemviakey($key,$limit,$skip)
+		{
+			$limit=(int)$limit;
+			$skip=(int)$skip;
+			if($skip<0)
+			{
+				$skip=0;
+			}
+			$res=array();
+			if($limit==0)
+			{
+				return $res;
+			}
+			elseif($limit<0 || $limit==NULL)
+			{
+				$limit=-1;
+			}
+			if($key!='$all')
+			{
+				$key=urlencode((string)$key);
+			}
+			$s=0;
+			$i=0;
+			$res=array();
+			if($key=='$all')
+			{
+				foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+				{
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+						foreach($collIndex as &$line)
+						{
+							if($s>=$skip)
+							{
+								if($i<=$limit && $limit!=-1)
+								{
+									$line=str_replace("\n","",$line);
+									if($line!='')
+									{
+										$split=explode(",",$line);
+										$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+											$prop=$this->getprop($split[0],$collection);
+											array_push($res,array("uid"=>(string)$split[0],"content"=>(string)file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs'),"prop"=>$prop));
+									}
+									$i++;
+								}
+								elseif($limit==-1)
+								{
+									$line=str_replace("\n","",$line);
+									if(line!='')
+									{
+										$split=explode(",",$line);
+										$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+											$prop=$this->getprop($split[0],$collection);
+											array_push($res,array("uid"=>(string)$split[0],"content"=>(string)file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs'),"prop"=>$prop));
+									}
+									$i++;
+								}
+								else
+								{
+									break;
+								}
+							}
+							else
+							{
+								$s++;
+							}
+						}
+				}
+			}
+			else
+			{
+				foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+				{
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+						foreach($collIndex as &$line)
+						{
+							if($s>=$skip)
+							{
+								if($i<=$limit && $limit!=-1)
+								{
+									$line=str_replace("\n","",$line);
+									if($line!='')
+									{
+										$split=explode(",",$line);
+										if($split[1]==$key)
+										{
+											$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+												$prop=$this->getprop($split[0],$collection);
+												array_push($res,array("uid"=>(string)$split[0],"content"=>(string)file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs'),"prop"=>$prop));
+										}
+									}
+									$i++;
+								}
+								elseif($limit==-1)
+								{
+									$line=str_replace("\n","",$line);
+									if($line!='')
+									{
+										$split=explode(",",$line);
+										if($split[1]==$key)
+										{
+											$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+												$prop=$this->getprop($split[0],$collection);
+												array_push($res,array("uid"=>(string)$split[0],"content"=>(string)file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs'),"prop"=>$prop));
+										}
+									}
+									$i++;
+								}
+								else
+								{
+									break;
+								}
+							}
+							else
+							{
+								$s++;
+							}
+						}
+				}
+			}
+			return $res;
+		}
+	
+		protected function getprop($uid,$coll=NULL)
+		{
+			$res=array();
+			if($coll==NULL)
+			{
+				foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+				{
+					if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp'))
+					{
+						$f=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+							foreach($f as &$line)
+							{
+								$line=str_replace("\n","",$line);
+								if($line!='')
+								{
+									$split=explode(",",$line);
+									$split[0]=urlencode((string)$split[0]);
+									$split[1]=urlencode((string)$split[1]);
+									$res[$split[0]]=$split[1];
+								}
+							return $res;
+							}
+					}
+					else
+					{
+						return $res;
+					}
+				}
+			}
+			else
+			{
+				if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp'))
+				{
+					$f=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+						foreach($f as &$line)
+						{
+							$line=str_replace("\n","",$line);
+							if($line!='')
+							{
+								$split=explode(",",$line);
+								$split[0]=urlencode((string)$split[0]);
+								$split[1]=urlencode((string)$split[1]);
+								$res[$split[0]]=$split[1];
+							}
+						}
+						return $res;
+				}
+				else
+				{
+					return $res;
+				}
+			}
+		}
 	}
 	$a=new DGStorage();
 	$a->create('test');
