@@ -148,6 +148,27 @@ class DGStorage:
 	
 	def fetch(self,limit=5,skip=0):
 		return self.finditemviakey('$all',limit,skip);
+		
+	def put(self,uid,content):
+		import codecs;
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				findStatus=False;
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==uid:
+							with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgs','w',self.DGSTORAGE_CHARSET) as storage:
+								storage.write(content);
+							findStatus=True;
+					if findStatus==True:
+						break;
+			if findStatus==True:
+				break;
+			else:
+				return False;
+		return True;
 	
 	def remove(self,uid):
 		import os;

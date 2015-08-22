@@ -189,6 +189,43 @@
 			return $this->finditemviakey('$all',$limit,$skip);
 		}
 		
+		public function put($uid,$content)
+		{
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					$findStatus=False;
+					foreach($collIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							if($split[0]==$uid)
+							{
+								$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgs','w');
+									fwrite($storage,$content);
+									fclose($storage);
+								$findStatus=True;
+							}
+						}
+						if($findStatus==True)
+						{
+							break;
+						}
+					}
+				if($findStatus==True)
+				{
+					break;
+				}
+				else
+				{
+					return False;
+				}
+			}
+			return True;
+		}
+		
 		public function remove($uid)
 		{
 			$index=file($GLOBALS["DGSTORAGE"]["Name"].'/index/index.dgi');
