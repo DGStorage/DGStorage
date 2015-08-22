@@ -92,16 +92,16 @@
 		}
 		
 		
-		public function add($key,$content,$prop=NULL)
+		public function add($key,$content,$prop=array())
 		{
-			$key=str_replace("\n","",$key);
+			$key=str_replace("\n","",(string)$key);
 			$key=urlencode($key);
-			$operationCollection=NULL;
+			$operationCollection='';
 			if($key=='')
 			{
 				return False;
 			}
-			if(array_count($GLOBALS["DGSTORAGE"]["CollectionCache"])==0)
+			if($this->array_count($GLOBALS["DGSTORAGE"]["CollectionCache"])==0)
 			{
 				if($this->createcoll(0))
 				{
@@ -112,6 +112,71 @@
 					return False;
 				}
 			}
+			else
+			{
+				if($GLOBALS["DGSTORAGE"]["LastCollection"]!='')
+				{
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$GLOBALS["DGSTORAGE"]["LastCollection"].'/index/index.dgi');
+						$i=0;
+						foreach($collIndex as &$line)
+						{
+							if($line!='')
+							{
+								$i++;
+							}
+						}
+						if($i<$GLOBALS["DGSTORAGE"]["SINGLECOLLECTIONLIMIT"])
+						{
+							$operationCollection=$GLOBALS["DGSTORAGE"]["LastCollection"];
+						}
+						else
+						{
+							$operationCollection=$this->findavailablecoll(True);
+						}
+					fclose($collIndex);
+				}
+				else
+				{
+					$operationCollection=$this->findavailablecoll(True);
+				}
+			}
+			$GLOBALS["DGSTORAGE"]["LastCollection"]=$operationCollection;
+			$uid='';
+			$collIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/index/index.dgi','a');
+				$collIndexR=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/index/index.dgi');
+				$i=0;
+				foreach($collIndexR as &$line)
+				{
+					if($line!='' && $line!="\n")
+					{
+						$i++;
+					}
+				}
+				$uid=$this->uuid();
+				if($i==0)
+				{
+					fwrite($collIndex,(string)$uid.','.(string)$key);
+				}
+				else
+				{
+					fwrite($collIndex,"\n".(string)$uid.','.(string)$key);
+				}
+				fclose($collIndex);
+			$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgs','a');
+				fwrite($storage,(string)$content);
+				fclose($storage);
+			if($this->array_count($prop)!=0)
+			{
+				$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgp','a');
+					foreach($prop as &$propItem)
+					{
+						$propItem=urlencode((string)$propItem);
+						$prop[$propItem]=urlencode((string)$prop[$propItem]);
+						fwrite($storageProp,(string)$propItem.':'.(string)$prop[$propItem]."\n");
+					}
+					fclose($storageProp);
+			}
+			return $uid;
 		}
 		
 		public function get($key,$limit=-1,$skip=0)
@@ -122,6 +187,68 @@
 		public function fetch($limit=5,$skip=0)
 		{
 			return $this->finditemviakey('$all',$limit,$skip);
+		}
+		
+		public function remove($uid)
+		{
+			$index=file($GLOBALS["DGSTORAGE"]["Name"].'/index/index.dgi');
+				$findStatus=False;
+				foreach($index as &$line)
+				{
+					$line=str_replace("\n","",$line);
+					$itemList=array();
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
+						foreach($collIndex as &$row)
+						{
+							$row=str_replace("\n","",$row);
+							$split=explode(",",$row);
+							if($split[0]==$uid)
+							{
+								unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgs');
+								if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp'))
+								{
+									unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp');
+								}
+								$findStatus=True;
+							}
+							else
+							{
+								array_push($itemList,$row);
+							}
+						}
+						if($findStatus==True)
+						{
+							$collIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi','w');
+								$string='';
+								foreach($itemList as &$item)
+								{
+									$string=(string)$string.(string)$item."\n";
+								}
+								fwrite($collIndex,$string);
+								fclose($collIndex);
+							$i=0;
+							$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
+								foreach($collIndex as &$line)
+								{
+									$line=str_replace("\n","",$line);
+									if($line!='')
+									{
+										$i++;
+									}
+								}
+							if($i==0)
+							{
+								$this->removecoll((string)$line);
+							}
+							break;
+						}
+						fclose($collIndex);
+				}
+				if($findStatus==False)
+				{
+					return False;
+				}
+			return True;
 		}
 		
 		protected function uuid(){
@@ -168,7 +295,35 @@
 			}
 		}
 		
-		protected function findavailablecoll($reateNewColl=False)
+		protected function removecoll($coll)
+		{
+			unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/index/index.dgi');
+			rmdir($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/index');
+			rmdir($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll);
+			unset($GLOBALS["DGSTORAGE"]["CollectionCache"][array_search((string)$coll,$GLOBALS["DGSTORAGE"]["CollectionCache"])]);
+			$collCache=array();
+			$index=file($GLOBALS["DGSTORAGE"]["Name"].'/index/index.dgi');
+				foreach($index as &$line)
+				{
+					$line=str_replace("\n","",$line);
+					if($line!=(string)$coll)
+					{
+						array_push($collCache,$line);
+					}
+				}
+			$index=fopen($GLOBALS["DGSTORAGE"]["Name"].'/index/index.dgi','w');
+				if($this->array_count($collCache)!=0)
+				{
+					foreach($collCache as &$collection)
+					{
+						fwrite($index,(string)$collection."\n");
+					}
+				}
+				fclose($index);
+			return True;
+		}
+		
+		protected function findavailablecoll($createNewColl=False)
 		{
 			$searchRange=$GLOBALS["DGSTORAGE"]["SEARCHRANGE"];
 			if ($searchRange!='' || $searchRange!=NULL)
