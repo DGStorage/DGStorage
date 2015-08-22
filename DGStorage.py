@@ -298,7 +298,7 @@ class DGStorage:
 									split=line.split(',');
 									with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 										prop=self.getprop(split[0],collection);
-										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
+										res.append({"uid":str(split[0]),"key":str(split[1]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							elif limit==-1:
 								line=line.replace('\n','');
@@ -306,7 +306,7 @@ class DGStorage:
 									split=line.split(',');
 									with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 										prop=self.getprop(split[0],collection);
-										res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
+										res.append({"uid":str(split[0]),"key":str(split[1]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							else:
 								break;
@@ -324,7 +324,7 @@ class DGStorage:
 									if split[1]==key:
 										with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 											prop=self.getprop(split[0],collection);
-											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
+											res.append({"uid":str(split[0]),"key":str(split[1]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							elif limit==-1:
 								line=line.replace('\n','');
@@ -333,7 +333,7 @@ class DGStorage:
 									if split[1]==key:
 										with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
 											prop=self.getprop(split[0],collection);
-											res.append({"uid":str(split[0]),"content":str(storage.read()),"prop":prop});
+											res.append({"uid":str(split[0]),"key":str(split[1]),"content":str(storage.read()),"prop":prop});
 								i+=1;
 							else:
 								break;
