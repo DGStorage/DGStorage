@@ -92,7 +92,7 @@ class DGStorage:
 		import urllib.parse;
 		key=str(key).replace('\n','');
 		key=urllib.parse.quote_plus(str(key));
-		operationCollection=''
+		operationCollection='';
 		if key=='':
 			return False;
 		if len(self.CollectionCache)==0:
@@ -162,6 +162,48 @@ class DGStorage:
 							if storage.read().find(str(keyword))!=-1:
 								res.append(self.finditemviauid(split[0],str(collection)));
 		return res;
+	
+	def pervious(self,uid):
+		pervious='';
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==uid:
+							if pervious!='':
+								return pervious;
+							else:
+								with open(self.DGSTORAGE_Name+'/'+str(self.CollectionCache[-1])+'/index/index.dgi') as lastColl:
+									lastUid='';
+									for line in lastColl:
+										line=line.replace("\n","");
+										if line!='':
+											lastUid=line;
+									return line.split(",")[0];
+						else:
+							pervious=split[0];
+		return False;
+	
+	def following(self,uid):
+		follow='';
+		find=False;
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==uid:
+							find=True;
+						else:
+							if find==True:
+								return split[0];
+		with open(self.DGSTORAGE_Name+'/'+str(self.CollectionCache[0])+'/index/index.dgi') as firstColl:
+			for line in firstColl:
+				if line!='':
+					return line.split(",")[0];
 	
 	def put(self,uid,content):
 		import codecs;

@@ -213,6 +213,90 @@
 			return $res;
 		}
 		
+	public function pervious($uid)
+	{
+		$pervious='';
+		foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+		{
+			$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+				foreach($collIndex as &$line)
+				{
+					$line=str_replace("\n","",$line);
+					if($line!='')
+					{
+						$split=explode(",",$line);
+						if($split[0]==$uid)
+						{
+							if($pervious!='')
+							{
+								return $pervious;
+							}
+							else
+							{
+								$pop=$GLOBALS["DGSTORAGE"]["CollectionCache"];
+								$pop=array_pop($pop);
+								$lastColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$pop.'/index/index.dgi');
+									$lastUid='';
+									foreach($lastColl as &$line)
+									{
+										$line=str_replace("\n","",$line);
+										if(line!='')
+										{
+											$lastUid=$line;
+										}
+									}
+									$splitRes=explode(",",$line);
+									return $splitRes[0];
+							}
+						}
+						else
+						{
+							$pervious=$split[0];
+						}
+					}
+				}
+		}
+		return False;
+	}
+	
+	public function following($uid)
+	{
+		$follow='';
+		$find=False;
+		foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+		{
+			$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+				foreach($collIndex as &$line)
+				{
+					$line=str_replace("\n","",$line);
+					if(line!='')
+					{
+						$split=explode(",",$line);
+						if($split[0]==$uid)
+						{
+							$find=True;
+						}
+						else
+						{
+							if($find==True)
+							{
+								return $split[0];
+							}
+						}
+					}
+				}
+		}
+		$firstColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)($GLOBALS["DGSTORAGE"]["CollectionCache"][0]).'/index/index.dgi');
+			foreach($firstColl as &$line)
+			{
+				if($line!='')
+				{
+					$split=explode(",",$line);
+					return $split[0];
+				}
+			}
+	}
+		
 		public function put($uid,$content)
 		{
 			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
