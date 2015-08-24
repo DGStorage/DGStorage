@@ -250,17 +250,22 @@ class DGStorage:
 				return False;
 			for element in srt:
 				res.append(element);
-			with open(self.DGSTORAGE_Name+'/cache/prop/index.dgi') as cacheIndex:
-				count=0;
-				for line in cacheIndex:
-					line=line.replace('\n','');
-					if line!='':
-						count+=1;
-				if count>=self.DGSTORAGE_PROPCACHELIMIT:
-					if limit==-1:
-						return res[skip:];
-					else:
-						return res[skip:skip+limit];
+			try:
+				open(self.DGSTORAGE_Name+'/cache/prop/index.dgi');
+			except:
+				pass;
+			else:
+				with open(self.DGSTORAGE_Name+'/cache/prop/index.dgi') as cacheIndex:
+					count=0;
+					for line in cacheIndex:
+						line=line.replace('\n','');
+						if line!='':
+							count+=1;
+					if count>=self.DGSTORAGE_PROPCACHELIMIT:
+						if limit==-1:
+							return res[skip:];
+						else:
+							return res[skip:skip+limit];
 			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb','a') as cacheTimeStamp:
 				cacheTimeStamp.write(self.DGSTORAGE_TimeStamp);
 			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgc','a') as cacheObject:

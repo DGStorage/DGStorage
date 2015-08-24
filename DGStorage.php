@@ -395,27 +395,30 @@
 				{
 					array_push($res,array("uid"=>$key,"propValue"=>$element));
 				}
-				$cacheIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi');
-					$count=0;
-					foreach($cacheIndex as &$line)
-					{
-						$line=str_replace("\n","",$line);
-						if($line!='')
+				if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi'))
+				{
+					$cacheIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi');
+						$count=0;
+						foreach($cacheIndex as &$line)
 						{
-							$count++;
+							$line=str_replace("\n","",$line);
+							if($line!='')
+							{
+								$count++;
+							}
 						}
-					}
-					if($count>=$GLOBALS["DGSTORAGE"]["PROPCACHELIMIT"])
-					{
-						if($limit==-1)
+						if($count>=$GLOBALS["DGSTORAGE"]["PROPCACHELIMIT"])
 						{
-							return array_slice($res,$skip);
+							if($limit==-1)
+							{
+								return array_slice($res,$skip);
+							}
+							else
+							{
+								return array_slice($res,$skip,$limit);
+							}
 						}
-						else
-						{
-							return array_slice($res,$skip,$limit);
-						}
-					}
+				}
 				$cacheTimeStamp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.propItem.'_'.order.'.dgb','a');
 					fwrite($cacheTimeStamp,$GLOBALS["DGSTORAGE"]["TimeStamp"]);
 					fclose($cacheTimeStamp);
