@@ -263,7 +263,6 @@ class DGStorage:
 						return res[skip:skip+limit];
 			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb','a') as cacheTimeStamp:
 				cacheTimeStamp.write(self.DGSTORAGE_TimeStamp);
-				print(self.DGSTORAGE_TimeStamp);
 			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgc','a') as cacheObject:
 				for element in res:
 					cacheObject.write(element["uid"]+','+element["propValue"]+'\n');

@@ -8,15 +8,17 @@
 		function __construct()
 		{
 			$GLOBALS["DGSTORAGE"]=array();
-			$GLOBALS["DGSTORAGE"]["VERSION"]='2.1'; // DataCollection Version
+			$GLOBALS["DGSTORAGE"]["VERSION"]='2.2'; // DataCollection Version
 			$GLOBALS["DGSTORAGE"]["CHARSET"]='utf8'; // Default Charset
 			$GLOBALS["DGSTORAGE"]["SINGLECOLLECTIONLIMIT"]=1024; // Determine every collection can put how many datas
 			$GLOBALS["DGSTORAGE"]["SEARCHRANGE"]=3; // Determine when find a avalible collection, how many collection can we find. None stands find all collection.
 			$GLOBALS["DGSTORAGE"]["SEARCHINDEXLIMIT"]=64; // Determine DGStorage can storage how many indexs for quick search.
 			$GLOBALS["DGSTORAGE"]["SEARCHCACHELIMIT"]=32; // Determine DGStorage can storage how many caches for quick responds.
+			$GLOBALS["DGSTORAGE"]["PROPCACHELIMIT"]=16; // Determine DGStorage can storage how many caches for quick sort. 
 			$GLOBALS["DGSTORAGE"]["SAFETY"]=True; // Security settings, True not allowed access database out of the exec path.
 			
 			$GLOBALS["DGSTORAGE"]["Name"]=NULL;
+			$GLOBALS["DGSTORAGE"]["TimeStamp"]='';
 			
 			$GLOBALS["DGSTORAGE"]["CollectionCache"]=array();
 			$GLOBALS["DGSTORAGE"]["LastCollection"]=NULL;
@@ -48,6 +50,7 @@
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache");
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache/search");
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache/prop");
+			$this->uptmp();
 			return True;
 		}
 		
@@ -83,7 +86,7 @@
 						array_push($GLOBALS["DGSTORAGE"]["CollectionCache"],(string)$line);
 					}
 				}
-				
+				$GLOBALS["DGSTORAGE"]["TimeStamp"]=file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/cache/time.dgb');
 			}
 			else
 			{
@@ -176,6 +179,7 @@
 					}
 					fclose($storageProp);
 			}
+			$this->uptmp();
 			return $uid;
 		}
 		
@@ -218,89 +222,222 @@
 			return $res;
 		}
 		
-	public function pervious($uid)
-	{
-		$pervious='';
-		foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+		public function pervious($uid)
 		{
-			$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
-				foreach($collIndex as &$line)
-				{
-					$line=str_replace("\n","",$line);
-					if($line!='')
+			$pervious='';
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					foreach($collIndex as &$line)
 					{
-						$split=explode(",",$line);
-						if($split[0]==$uid)
+						$line=str_replace("\n","",$line);
+						if($line!='')
 						{
-							if($pervious!='')
+							$split=explode(",",$line);
+							if($split[0]==$uid)
 							{
-								return $pervious;
+								if($pervious!='')
+								{
+									return $pervious;
+								}
+								else
+								{
+									$pop=$GLOBALS["DGSTORAGE"]["CollectionCache"];
+									$pop=array_pop($pop);
+									$lastColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$pop.'/index/index.dgi');
+										$lastUid='';
+										foreach($lastColl as &$line)
+										{
+											$line=str_replace("\n","",$line);
+											if(line!='')
+											{
+												$lastUid=$line;
+											}
+										}
+										$splitRes=explode(",",$line);
+										return $splitRes[0];
+								}
 							}
 							else
 							{
-								$pop=$GLOBALS["DGSTORAGE"]["CollectionCache"];
-								$pop=array_pop($pop);
-								$lastColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$pop.'/index/index.dgi');
-									$lastUid='';
-									foreach($lastColl as &$line)
-									{
-										$line=str_replace("\n","",$line);
-										if(line!='')
-										{
-											$lastUid=$line;
-										}
-									}
-									$splitRes=explode(",",$line);
-									return $splitRes[0];
+								$pervious=$split[0];
 							}
 						}
-						else
+					}
+			}
+			return False;
+		}
+		
+		public function following($uid)
+		{
+			$follow='';
+			$find=False;
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					foreach($collIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if(line!='')
 						{
-							$pervious=$split[0];
+							$split=explode(",",$line);
+							if($split[0]==$uid)
+							{
+								$find=True;
+							}
+							else
+							{
+								if($find==True)
+								{
+									return $split[0];
+								}
+							}
 						}
 					}
-				}
-		}
-		return False;
-	}
-	
-	public function following($uid)
-	{
-		$follow='';
-		$find=False;
-		foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
-		{
-			$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
-				foreach($collIndex as &$line)
+			}
+			$firstColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)($GLOBALS["DGSTORAGE"]["CollectionCache"][0]).'/index/index.dgi');
+				foreach($firstColl as &$line)
 				{
-					$line=str_replace("\n","",$line);
-					if(line!='')
+					if($line!='')
 					{
 						$split=explode(",",$line);
-						if($split[0]==$uid)
-						{
-							$find=True;
-						}
-						else
-						{
-							if($find==True)
-							{
-								return $split[0];
-							}
-						}
+						return $split[0];
 					}
 				}
 		}
-		$firstColl=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)($GLOBALS["DGSTORAGE"]["CollectionCache"][0]).'/index/index.dgi');
-			foreach($firstColl as &$line)
+		
+		public function sort($propItem,$order="WORD",$limit=5,$skip=0)
+		{
+			$propItem=(string)$propItem;
+			$propItem=urlencode($propItem);
+			$sortArray=array();
+			$res=array();
+			if($skip<0)
 			{
-				if($line!='')
+				$skip=0;
+			}
+			if($limit==0)
+			{
+				return $res;
+			}
+			elseif($limit<0 || $limit==NULL)
+			{
+				$limit=-1;
+			}
+			if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgb'))
+			{
+				$cacheTimeStamp=file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgb');
+					if($cacheTimeStamp!=$GLOBALS["DGSTORAGE"]["TimeStamp"])
+					{
+						unlink($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgb');
+						unlink($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgc');
+						return $this->sort($propItem,$order,$limit,$skip);
+					}
+				$cacheObject=file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgc');
+					foreach($cacheObject as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							array_push($res,array("uid"=>$split[0],"propValue"=>$split[1]));
+						}
+					}
+					if($limit==-1)
+					{
+						return array_slice($res,$skip);
+					}
+					else
+					{
+						return array_slice($res,$skip,$limit);
+					}
+			}
+			else
+			{
+				foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
 				{
-					$split=explode(",",$line);
-					return $split[0];
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+						foreach($collIndex as &$line)
+						{
+							$line=str_replace("\n","",$line);
+							if($line!='')
+							{
+								$split=explode(",",$line);
+								$prop=$this->getprop($split[0],$collection);
+								if($prop[propItem]===NULL)
+								{
+									return False;
+								}
+								else
+								{
+									array_push($sortArray,array($split[0]=>$prop[$propItem]));
+								}
+							}
+						}
+				}
+				if($order=="WORD")
+				{
+					$srt=asort($sortArray,SORT_STRING);
+				}
+				elseif($order=="ASC")
+				{
+					$srt=asort($sortArray,SORT_NUMERIC);
+				}
+				elseif($order=="DESC")
+				{
+					$srt=arsort($sortArray,SORT_NUMERIC);
+				}
+				else
+				{
+					return False;
+				}
+				foreach($srt as $key=>&$element)
+				{
+					array_push($res,array("uid"=>$key,"propValue"=>$element));
+				}
+				$cacheIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi');
+					$count=0;
+					foreach($cacheIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$count++;
+						}
+					}
+					if($count>=$GLOBALS["DGSTORAGE"]["PROPCACHELIMIT"])
+					{
+						if($limit==-1)
+						{
+							return array_slice($res,$skip);
+						}
+						else
+						{
+							return array_slice($res,$skip,$limit);
+						}
+					}
+				$cacheTimeStamp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.propItem.'_'.order.'.dgb','a');
+					fwrite($cacheTimeStamp,$GLOBALS["DGSTORAGE"]["TimeStamp"]);
+					fclose($cacheTimeStamp);
+				$cacheObject=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'+propItem+'_'+order+'.dgc','a');
+					foreach($res as &$element)
+					{
+						fwrite($cacheObject,$element["uid"].','.$element["propValue"]."\n");
+					}
+					fclose($cacheObject);
+				$cacheIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi','a');
+					fwrite($cacheIndex,propItem.'_'.order);
+					fclose($cacheIndex);
+				if($limit==-1)
+				{
+					return array_slice($res,$skip);
+				}
+				else
+				{
+					return array_slice($rse,$skip,$limit);
 				}
 			}
-	}
+		}
 		
 		public function put($uid,$content)
 		{
@@ -336,6 +473,7 @@
 					return False;
 				}
 			}
+			$this->uptmp();
 			return True;
 		}
 		
@@ -397,6 +535,7 @@
 			{
 				return False;
 			}
+			$this->uptmp();
 			return True;
 		}
 		
@@ -748,12 +887,16 @@
 			}
 		}
 		
+		protected function uptmp()
+		{
+			$timeStamp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/time.dgb','w');
+				$sts=$this->uuid();
+				fwrite($timeStamp,$sts);
+				$GLOBALS["DGSTORAGE"]["TimeStamp"]=$sts;
+				fclose($timeStamp);
+			return True;
+		}
 	
 	}
-	
-	/*$a=new DGStorage();
-	//$a->create('test');
-	$a->select('ddd');
-	var_dump($a->get(15));
-	*/
+
 ?>
