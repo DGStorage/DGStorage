@@ -189,6 +189,30 @@
 			return $this->finditemviakey('$all',$limit,$skip);
 		}
 		
+		public function search($keyword,$cache=False)
+		{
+			$res=array();
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					foreach($collIndex as &$line)
+					{
+						str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							$storage=file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+								if(strpos($storage,(string)$keyword)!==False)
+								{
+									array_push($res,$this->finditemviauid($split[0],(string)$collection));
+								}
+								fclose($storage);
+						}
+					}
+			}
+			return $res;
+		}
+		
 		public function put($uid,$content)
 		{
 			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
@@ -528,7 +552,62 @@
 			}
 			return $res;
 		}
-	
+		
+		protected function finditemviauid($uid,$coll=NULL)
+		{
+			$res=array();
+			if($coll==NULL)
+			{
+				foreach($GLOBALS["DGSTORAGE"]["Name"] as &$collection)
+				{
+					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+						foreach($collIndex as &$line)
+						{
+							$line=str_replace("\n","",$line);
+							if($line!='')
+							{
+								$split=explode(",",$line);
+								if($split[0]==(string)$uid)
+								{
+									$storage=file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$split[0].'.dgs');
+										$res["uid"]=(string)$split[0];
+										$res["key"]=(string)$split[1];
+										$res["content"]=($storage);
+										$res["prop"]=$this->getprop($split[0],$collection);
+										fclose($storage);
+										return $res;
+								}
+							}
+						}
+				}
+				return $res;
+			}
+			else
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/index/index.dgi');
+					foreach($collIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							if($split[0]==(string)$uid)
+							{
+								$storage=file_get_contents($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$coll.'/'.(string)$uid.'.dgs');
+									$res["uid"]=(string)$split[0];
+									$res["key"]=(string)$split[1];
+									$res["content"]=($storage);
+									$res["prop"]=$this->getprop($split[0],$collection);
+									fclose($storage);
+									return $res;
+							}
+						}
+					
+					}
+					return $res;
+			}
+		}
+		
 		protected function getprop($uid,$coll=NULL)
 		{
 			$res=array();

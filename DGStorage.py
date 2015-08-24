@@ -148,7 +148,21 @@ class DGStorage:
 	
 	def fetch(self,limit=5,skip=0):
 		return self.finditemviakey('$all',limit,skip);
-		
+	
+	def search(self,keyword,cache=False):
+		import codecs;
+		res=[];
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs','r','utf8') as storage:
+							if storage.read().find(str(keyword))!=-1:
+								res.append(self.finditemviauid(split[0],str(collection)));
+		return res;
+	
 	def put(self,uid,content):
 		import codecs;
 		for collection in self.CollectionCache:
@@ -339,6 +353,38 @@ class DGStorage:
 						else:
 							s+=1;
 		return res;
+	
+	def finditemviauid(self,uid,coll=None):
+		res={};
+		if coll==None:
+			for collection in self.CollectionCache:
+				with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+					for line in collIndex:
+						line=line.replace('\n','');
+						if line!='':
+							split=line.split(',');
+							if split[0]==str(uid):
+								with open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs') as storage:
+									res["uid"]=str(split[0]);
+									res["key"]=str(split[1]);
+									res["content"]=str(storage.read())
+									res["prop"]=self.getprop(split[0],collection);
+									return res;
+			return res;
+		else:
+			with open(self.DGSTORAGE_Name+'/'+str(coll)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==str(uid):
+							with open(self.DGSTORAGE_Name+'/'+str(coll)+'/'+str(split[0])+'.dgs') as storage:
+								res["uid"]=str(split[0]);
+								res["key"]=str(split[1]);
+								res["content"]=str(storage.read())
+								res["prop"]=self.getprop(split[0],coll);
+								return res;
+				return res;
 	
 	def getprop(self,uid,coll=None):
 		import codecs;
