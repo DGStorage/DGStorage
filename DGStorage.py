@@ -8,15 +8,17 @@ class DGStorage:
 		import os;
 		import sys;
 		
-		self.DGSTORAGE_VERSION='2.1'; # DataCollection Version
+		self.DGSTORAGE_VERSION='2.2'; # DataCollection Version
 		self.DGSTORAGE_CHARSET='utf8'; # Default Charset
 		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024; # Determine every collection can put how many datas
 		self.DGSTORAGE_SEARCHRANGE=3; # Determine when find a avalible collection, how many collection can we find. None stands find all collection.
 		self.DGSTORAGE_SEARCHINDEXLIMIT=64; # Determine DGStorage can storage how many indexs for quick search.
 		self.DGSTORAGE_SEARCHCACHELIMIT=32; # Determine DGStorage can storage how many caches for quick responds.
+		self.DGSTORAGE_PROPCACHELIMIT=16; # Determine DGStorage can storage how many caches for quick sort.
 		self.DGSTORAGE_SAFETY=True; # Security settings, True not allowed access database out of the exec path.
 		
 		self.DGSTORAGE_Name=None;
+		self.DGSTORAGE_TimeStamp='';
 		
 		self.CollectionCache=[];
 		self.LastCollection='';
@@ -53,6 +55,7 @@ class DGStorage:
 			os.mkdir(self.DGSTORAGE_Name+'/cache');
 			os.mkdir(self.DGSTORAGE_Name+'/cache/search');
 			os.mkdir(self.DGSTORAGE_Name+'/cache/prop');
+			self.uptmp();
 			return True;
 	
 	def select(self,name):
@@ -77,6 +80,8 @@ class DGStorage:
 					line=line.replace('\n','');
 					if line!='':
 						self.CollectionCache.append(str(line));
+			with open(self.DGSTORAGE_Name+'/cache/time.dgb') as cacheTimeStamp:
+				self.DGSTORAGE_TimeStamp=cacheTimeStamp.read();
 			return len(self.CollectionCache);
 		else:
 			os.rmdir(self.DGSTORAGE_Name);
@@ -135,6 +140,7 @@ class DGStorage:
 					propItem=urllib.parse.quote_plus(str(propItem));
 					prop[propItem]=urllib.parse.quote_plus(str(prop[propItem]));
 					storageProp.write(str(propItem)+':'+str(prop[propItem])+'\n');
+		self.uptmp();
 		return uid;
 	
 	def index(self,key):
@@ -205,6 +211,85 @@ class DGStorage:
 				if line!='':
 					return line.split(",")[0];
 	
+	def sort(self,propItem,order="WORD",limit=5,skip=0):
+		import urllib.parse;
+		import os;
+		propItem=str(propItem);
+		propItem=urllib.parse.quote_plus(propItem);
+		sortArray=[];
+		res=[];
+		if skip<0:
+			skip=0;
+		if limit==0:
+			return res;
+		elif limit<0 or limit==None:
+			limit=-1;
+		try:
+			open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb');
+		except:
+			for collection in self.CollectionCache:
+				with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+					for line in collIndex:
+						line=line.replace('\n','');
+						if line!='':
+							split=line.split(",");
+							prop=self.getprop(split[0],collection);
+							try:
+								prop[propItem];
+							except:
+								return False;
+							else:
+								sortArray.append({"uid":split[0],"propValue":(prop[propItem])});
+			if order=="WORD":
+				srt=sorted(sortArray,key=lambda x:str(x["propValue"]));
+			elif order=="ASC":
+				srt=sorted(sortArray,key=lambda x:float(x["propValue"]));
+			elif order=="DESC":
+				srt=sorted(sortArray,key=lambda x:float(x["propValue"]),reverse=True);
+			else:
+				return False;
+			for element in srt:
+				res.append(element);
+			with open(self.DGSTORAGE_Name+'/cache/prop/index.dgi') as cacheIndex:
+				count=0;
+				for line in cacheIndex:
+					line=line.replace('\n','');
+					if line!='':
+						count+=1;
+				if count>=self.DGSTORAGE_PROPCACHELIMIT:
+					if limit==-1:
+						return res[skip:];
+					else:
+						return res[skip:skip+limit];
+			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb','a') as cacheTimeStamp:
+				cacheTimeStamp.write(self.DGSTORAGE_TimeStamp);
+				print(self.DGSTORAGE_TimeStamp);
+			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgc','a') as cacheObject:
+				for element in res:
+					cacheObject.write(element["uid"]+','+element["propValue"]+'\n');
+			with open(self.DGSTORAGE_Name+'/cache/prop/index.dgi','a') as cacheIndex:
+				cacheIndex.write(propItem+'_'+order);
+			if limit==-1:
+				return res[skip:];
+			else:
+				return res[skip:skip+limit];
+		else:
+			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb') as cacheTimeStamp:
+				if cacheTimeStamp.read()!=self.DGSTORAGE_TimeStamp:
+					os.remove(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgb');
+					os.remove(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgc');
+					return self.sort(propItem,order,limit,skip);
+			with open(self.DGSTORAGE_Name+'/cache/prop/'+propItem+'_'+order+'.dgc') as cacheObject:
+				for line in cacheObject:
+					line=line.replace("\n","");
+					if line!='':
+						split=line.split(",");
+						res.append({"uid":split[0],"propValue":split[1]});
+				if limit==-1:
+					return res[skip:];
+				else:
+					return res[skip:skip+limit];
+	
 	def put(self,uid,content):
 		import codecs;
 		for collection in self.CollectionCache:
@@ -224,6 +309,7 @@ class DGStorage:
 				break;
 			else:
 				return False;
+		self.uptmp();
 		return True;
 	
 	def remove(self,uid):
@@ -263,6 +349,7 @@ class DGStorage:
 				break;
 			if findStatus==False:
 				return False;
+		self.uptmp();
 		return True;
 	
 	#Private
@@ -463,6 +550,14 @@ class DGStorage:
 							split[1]=urllib.parse.unquote_plus(str(split[1]));
 							res[split[0]]=split[1];
 					return res;
+	
+	def uptmp(self):
+		import uuid;
+		with open(self.DGSTORAGE_Name+'/cache/time.dgb','w') as timeStamp:
+			sts=str(uuid.uuid1());
+			timeStamp.write(sts);
+			self.DGSTORAGE_TimeStamp=sts;
+		return True;
 
 class DGStorageShell(DGStorage):
 	def shellAdd(self,key,inFileLocation):
