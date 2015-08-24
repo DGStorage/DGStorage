@@ -597,7 +597,7 @@
 									$res["uid"]=(string)$split[0];
 									$res["key"]=(string)$split[1];
 									$res["content"]=($storage);
-									$res["prop"]=$this->getprop($split[0],$collection);
+									$res["prop"]=$this->getprop($split[0],$colln);
 									fclose($storage);
 									return $res;
 							}
