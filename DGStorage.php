@@ -189,6 +189,11 @@
 			return $this->finditemviakey('$all',$limit,$skip);
 		}
 		
+		public function uid($uid)
+		{
+			return $this->finditemviauid($uid);
+		}
+		
 		public function search($keyword,$cache=False)
 		{
 			$res=array();
@@ -642,7 +647,7 @@
 			$res=array();
 			if($coll==NULL)
 			{
-				foreach($GLOBALS["DGSTORAGE"]["Name"] as &$collection)
+				foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
 				{
 					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
 						foreach($collIndex as &$line)
