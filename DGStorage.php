@@ -228,63 +228,62 @@
 		
 		public function remove($uid)
 		{
-			$index=file($GLOBALS["DGSTORAGE"]["Name"].'/index/index.dgi');
-				$findStatus=False;
-				foreach($index as &$line)
-				{
-					$line=str_replace("\n","",$line);
-					$itemList=array();
-					$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
-						foreach($collIndex as &$row)
+			$findStatus=False;
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$line)
+			{
+				$line=str_replace("\n","",$line);
+				$itemList=array();
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
+					foreach($collIndex as &$row)
+					{
+						$row=str_replace("\n","",$row);
+						$split=explode(",",$row);
+						if($split[0]==$uid)
 						{
-							$row=str_replace("\n","",$row);
-							$split=explode(",",$row);
-							if($split[0]==$uid)
+							unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgs');
+							if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp'))
 							{
-								unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgs');
-								if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp'))
-								{
-									unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp');
-								}
-								$findStatus=True;
+								unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/'.(string)$uid.'.dgp');
 							}
-							else
-							{
-								array_push($itemList,$row);
-							}
+							$findStatus=True;
 						}
-						if($findStatus==True)
+						else
 						{
-							$collIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi','w');
-								$string='';
-								foreach($itemList as &$item)
-								{
-									$string=(string)$string.(string)$item."\n";
-								}
-								fwrite($collIndex,$string);
-								fclose($collIndex);
-							$i=0;
-							$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
-								foreach($collIndex as &$line)
-								{
-									$line=str_replace("\n","",$line);
-									if($line!='')
-									{
-										$i++;
-									}
-								}
-							if($i==0)
-							{
-								$this->removecoll((string)$line);
-							}
-							break;
+							array_push($itemList,$row);
 						}
-						fclose($collIndex);
-				}
-				if($findStatus==False)
-				{
-					return False;
-				}
+					}
+					if($findStatus==True)
+					{
+						$collIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi','w');
+							$string='';
+							foreach($itemList as &$item)
+							{
+								$string=(string)$string.(string)$item."\n";
+							}
+							fwrite($collIndex,$string);
+							fclose($collIndex);
+						$i=0;
+						$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$line.'/index/index.dgi');
+							foreach($collIndex as &$line)
+							{
+								$line=str_replace("\n","",$line);
+								if($line!='')
+								{
+									$i++;
+								}
+							}
+						if($i==0)
+						{
+							$this->removecoll((string)$line);
+						}
+						break;
+					}
+					fclose($collIndex);
+			}
+			if($findStatus==False)
+			{
+				return False;
+			}
 			return True;
 		}
 		

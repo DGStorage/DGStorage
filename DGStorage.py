@@ -173,39 +173,38 @@ class DGStorage:
 	def remove(self,uid):
 		import os;
 		import codecs;
-		with open(self.DGSTORAGE_Name+'/index/index.dgi') as index:
-			findStatus=False;
-			for line in index:
-				line=line.replace('\n','');
-				itemList=[];
+		findStatus=False;
+		for line in self.CollectionCache:
+			line=line.replace('\n','');
+			itemList=[];
+			with open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi') as collIndex:
+				for row in collIndex:
+					row=row.replace('\n','');
+					split=row.split(',');
+					if split[0]==uid:
+						os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgs');
+						try:
+							os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgp');
+						except FileNotFoundError:
+							pass;
+						findStatus=True;
+					else:
+						itemList.append(row);
+			if findStatus==True:
+				with codecs.open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi','w',self.DGSTORAGE_CHARSET) as collIndex:
+					string=''
+					for item in itemList:
+						string=str(string)+str(item)+'\n';
+					collIndex.write(string);
+				i=0;
 				with open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi') as collIndex:
-					for row in collIndex:
-						row=row.replace('\n','');
-						split=row.split(',');
-						if split[0]==uid:
-							os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgs');
-							try:
-								os.remove(self.DGSTORAGE_Name+'/'+str(line)+'/'+str(uid)+'.dgp');
-							except FileNotFoundError:
-								pass;
-							findStatus=True;
-						else:
-							itemList.append(row);
-				if findStatus==True:
-					with codecs.open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi','w',self.DGSTORAGE_CHARSET) as collIndex:
-						string=''
-						for item in itemList:
-							string=str(string)+str(item)+'\n';
-						collIndex.write(string);
-					i=0;
-					with open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi') as collIndex:
-						for line in collIndex:
-							line=line.replace('\n','');
-							if line!='':
-								i+=1;
-					if i==0:
-						self.removecoll(str(line));
-					break;
+					for line in collIndex:
+						line=line.replace('\n','');
+						if line!='':
+							i+=1;
+				if i==0:
+					self.removecoll(str(line));
+				break;
 			if findStatus==False:
 				return False;
 		return True;
