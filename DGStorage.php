@@ -168,11 +168,11 @@
 			if($this->array_count($prop)!=0)
 			{
 				$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgp','a');
-					foreach($prop as &$propItem)
+					foreach($prop as $prop=>&$propItem)
 					{
+						$prop=urlencode((string)$prop);
 						$propItem=urlencode((string)$propItem);
-						$prop[$propItem]=urlencode((string)$prop[$propItem]);
-						fwrite($storageProp,(string)$propItem.':'.(string)$prop[$propItem]."\n");
+						fwrite($storageProp,(string)$prop.':'.(string)$propItem."\n");
 					}
 					fclose($storageProp);
 			}
