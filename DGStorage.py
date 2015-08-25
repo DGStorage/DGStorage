@@ -91,7 +91,7 @@ class DGStorage:
 		import uuid;
 		return self.add(str(uuid.uuid1()),content,{"method":"append"});
 	
-	def add(self,key,content,prop={}):
+	def add(self,key,content,prop={},insertuid=None,rawProp=None):
 		import codecs;
 		import uuid;
 		import urllib.parse;
@@ -127,7 +127,10 @@ class DGStorage:
 				if line!='' and line!='\n':
 					i+=1;
 			collIndexR.close();
-			uid=uuid.uuid1();
+			if insertuid==None:
+				uid=uuid.uuid1();
+			else:
+				uid=insertuid;
 			if i==0:
 				collIndex.write(str(uid)+','+str(key));
 			else:
@@ -140,6 +143,9 @@ class DGStorage:
 					propItem=urllib.parse.quote_plus(str(propItem));
 					prop[propItem]=urllib.parse.quote_plus(str(prop[propItem]));
 					storageProp.write(str(propItem)+':'+str(prop[propItem])+'\n');
+		if insertuid!=None and rawProp!=None:
+			with codecs.open(self.DGSTORAGE_Name+'/'+str(operationCollection)+'/'+str(uid)+'.dgp','a',self.DGSTORAGE_CHARSET) as storageProp:
+				storageProp.write(rawProp);
 		self.uptmp();
 		return uid;
 	
@@ -425,6 +431,74 @@ class DGStorage:
 		self.uptmp();
 		return True;
 	
+	def zip(self,zipName="DGStorage"):
+		import codecs;
+		import urllib.parse;
+		if zipName=='' or zipName==None:
+			return False;
+		zipName=str(zipName).replace('.dgz','');
+		zipName=urllib.parse.quote_plus(str(zipName));
+		zip=codecs.open(zipName+'.dgz','a',self.DGSTORAGE_CHARSET);
+		zip.write(self.DGSTORAGE_Name+'\n');
+		with codecs.open(self.DGSTORAGE_Name+'/conf.dgb','r',self.DGSTORAGE_CHARSET) as conf:
+			zip.write(urllib.parse.quote_plus(conf.read())+'\n');
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						zip.write(split[0]+','+split[1]+',');
+						with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgs','r','utf8') as storage:
+							zip.write(urllib.parse.quote_plus(storage.read())+',');
+						try:
+							open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgp');
+						except:
+							zip.write('\n');
+						else:
+							with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(split[0])+'.dgp','r','utf8') as storageProp:
+								zip.write(urllib.parse.quote_plus(storageProp.read())+'\n');
+		zip.close();
+		return True;
+	
+	def unzip(self,zipName="DGStorage"):
+		import codecs;
+		import urllib.parse;
+		import os;
+		import uuid;
+		if zipName=='' or zipName==None:
+			return False;
+		zipName=str(zipName).replace('.dgz','');
+		zipName=urllib.parse.quote_plus(zipName);
+		try:
+			open(zipName+'.dgz');
+		except:
+			return False;
+		else:
+			zip=codecs.open(zipName+'.dgz','r',self.DGSTORAGE_CHARSET);
+			i=0;
+			for line in zip:
+				line=line.replace('\n','');
+				if i==0:
+					self.create(line);
+					self.select(line);
+					i+=1;
+				elif i==1:
+					os.remove(self.DGSTORAGE_Name+'/conf.dgb');
+					with codecs.open(self.DGSTORAGE_Name+'/conf.dgb','a',self.DGSTORAGE_CHARSET) as conf:
+						conf.write(urllib.parse.unquote_plus(line));
+					i+=1;
+				else:
+					split=line.split(',');
+					split[1]=urllib.parse.unquote_plus(split[1]);
+					split[2]=urllib.parse.unquote_plus(split[2]);
+					split[3]=urllib.parse.unquote_plus(split[3]);
+					if split[3]!='' and split[3]!='\n':
+						self.add(split[1],split[2],{},split[0],split[3]);
+					else:
+						self.add(split[1],split[2],{},split[0]);
+		return True;
+	
 	#Private
 	def clche(self,where=''):
 		if where=='':
@@ -702,3 +776,11 @@ if __name__ == '__main__':
 				shellHandle.select(str(sys.argv[2]));
 				if sys.argv[5].find('/')==-1:
 					shellHandle.shellFetch(str(sys.argv[3]),str(sys.argv[4]),'../'+str(sys.argv[5]));
+		if sys.argv[1]=='unzip':
+			try:
+				sys.argv[2];
+			except IndexError:
+				pass;
+			else:
+				shell=DGStorage();
+				shell.unzip(str(sys.argv[2]));
