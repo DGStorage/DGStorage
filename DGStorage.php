@@ -437,7 +437,7 @@
 					}
 					fclose($cacheObject);
 				$cacheIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi','a');
-					fwrite($cacheIndex,$propItem.'_'.$order);
+					fwrite($cacheIndex,$propItem.'_'.$order."\n");
 					fclose($cacheIndex);
 				if($limit==-1)
 				{
