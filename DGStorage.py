@@ -316,6 +316,77 @@ class DGStorage:
 		self.uptmp();
 		return True;
 	
+	def setprop(self,uid,propItem,propValue):
+		import codecs;
+		import urllib.parse;
+		propItem=urllib.parse.quote_plus(str(propItem));
+		propValue=urllib.parse.quote_plus(str(propValue));
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				changeStatus=False;
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==uid:
+							try:
+								open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp');
+							except:
+								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','a',self.DGSTORAGE_CHARSET) as storageProp:
+									storageProp.write(propItem+','+propValue);
+								changeStatus=True;
+							else:
+								propList={};
+								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','r',self.DGSTORAGE_CHARSET) as storageProp:
+									for line in storageProp:
+										line=line.replace('\n','');
+										if line!='':
+											split=line.split(':');
+											if split[0]!=propItem:
+												propList[split[0]]=split[1];
+									propList[propItem]=propValue;
+								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','w',self.DGSTORAGE_CHARSET) as storageProp:
+									for propElement in propList:
+										storageProp.write(propElement+':'+propList[propElement]+'\n');
+								return True;
+		return False;
+	
+	def removeprop(self,uid,propItem):
+		import codecs;
+		import urllib.parse;
+		import os;
+		propItem=urllib.parse.quote_plus(str(propItem));
+		for collection in self.CollectionCache:
+			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
+				changeStatus=False;
+				for line in collIndex:
+					line=line.replace('\n','');
+					if line!='':
+						split=line.split(',');
+						if split[0]==uid:
+							try:
+								open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp');
+							except:
+								return False;
+							else:
+								propList={};
+								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','r',self.DGSTORAGE_CHARSET) as storageProp:
+									for line in storageProp:
+										line=line.replace('\n','');
+										if line!='':
+											split=line.split(':');
+											if split[0]!=propItem:
+												propList[split[0]]=split[1];
+								if(len(propList)>0):
+									with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','w',self.DGSTORAGE_CHARSET) as storageProp:
+										for propElement in propList:
+											storageProp.write(propElement+':'+propList[propElement]+'\n');
+									return True;
+								else:
+									os.remove(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp');
+									return True;
+		return False;
+	
 	def remove(self,uid):
 		import os;
 		import codecs;
