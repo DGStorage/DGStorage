@@ -746,6 +746,7 @@ if __name__ == '__main__':
 	except IndexError:
 		pass;
 	else:
+		import sys;
 		if sys.argv[1]=='add':
 			try:
 				sys.argv[4];
