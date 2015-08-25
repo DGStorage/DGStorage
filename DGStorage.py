@@ -323,7 +323,6 @@ class DGStorage:
 		propValue=urllib.parse.quote_plus(str(propValue));
 		for collection in self.CollectionCache:
 			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
-				changeStatus=False;
 				for line in collIndex:
 					line=line.replace('\n','');
 					if line!='':
@@ -334,7 +333,7 @@ class DGStorage:
 							except:
 								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','a',self.DGSTORAGE_CHARSET) as storageProp:
 									storageProp.write(propItem+','+propValue);
-								changeStatus=True;
+								return True;
 							else:
 								propList={};
 								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','r',self.DGSTORAGE_CHARSET) as storageProp:
@@ -358,7 +357,6 @@ class DGStorage:
 		propItem=urllib.parse.quote_plus(str(propItem));
 		for collection in self.CollectionCache:
 			with open(self.DGSTORAGE_Name+'/'+str(collection)+'/index/index.dgi') as collIndex:
-				changeStatus=False;
 				for line in collIndex:
 					line=line.replace('\n','');
 					if line!='':

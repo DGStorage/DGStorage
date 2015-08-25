@@ -488,6 +488,117 @@
 			return True;
 		}
 		
+		public function setprop($uid,$propItem,$propValue)
+		{
+			$propItem=urlencode((string)$propItem);
+			$propValue=urlencode((string)$propValue);
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					foreach($collIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							if($split[0]==$uid)
+							{
+								if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp'))
+								{
+									$propList=array();
+									$storageProp=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+										foreach($storageProp as &$line)
+										{
+											$line=str_replace("\n","",$line);
+											if($line!='')
+											{
+												$split=explode(":",$line);
+												if($split[0]!=$propItem)
+												{
+													$propList[$split[0]]=$split[1];
+												}
+											}
+										}
+										$propList[$propItem]=$propValue;
+									$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp','w');
+										foreach($propList as $key=>&$propElement)
+										{
+											fwrite($storageProp,$key.':'.$propElement."\n");
+										}
+										fclose($storageProp);
+									return True;
+								}
+								else
+								{
+									$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp','a');
+										fwrite($storageProp,$key.':'.$propElement."\n");
+										fclose($storageProp);
+									return True;
+								}
+							}
+						}
+					}
+			}
+			return False;
+		}
+		
+		public function removeprop($uid,$propItem)
+		{
+			$propItem=urlencode((string)$propItem);
+			foreach($GLOBALS["DGSTORAGE"]["CollectionCache"] as &$collection)
+			{
+				$collIndex=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/index/index.dgi');
+					foreach($collIndex as &$line)
+					{
+						$line=str_replace("\n","",$line);
+						if($line!='')
+						{
+							$split=explode(",",$line);
+							if($split[0]==$uid)
+							{
+								if(is_file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp'))
+								{
+									$propList=array();
+									$storageProp=file($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+										foreach($storageProp as &$line)
+										{
+											$line=str_replace("\n","",$line);
+											if($line!='')
+											{
+												$split=explode(":",$line);
+												if($split[0]!=$propItem)
+												{
+													$propList[$split[0]]=$split[1];
+												}
+											}
+										}
+									if($this->array_count($propList)>0)
+									{
+										$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp','w');
+											foreach($propList as $key=>&$propElement)
+											{
+												fwrite($storageProp,$key.':'.$propElement."\n");
+											}
+											fclose($storageProp);
+										return True;
+									}
+									else
+									{
+										unlink($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$collection.'/'.(string)$uid.'.dgp');
+										return True;
+									}
+								}
+								else
+								{
+									return False;
+								}
+							}
+						}
+					}
+			}
+			return False;
+		}
+		
 		public function remove($uid)
 		{
 			$findStatus=False;
