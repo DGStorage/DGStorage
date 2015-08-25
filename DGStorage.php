@@ -364,34 +364,42 @@
 							{
 								$split=explode(",",$line);
 								$prop=$this->getprop($split[0],$collection);
-								if($prop[propItem]===NULL)
+								if($prop[$propItem]===NULL)
 								{
 									return False;
 								}
 								else
 								{
-									array_push($sortArray,array($split[0]=>$prop[$propItem]));
+									if($order!="WORD")
+									{
+										$sortArray[$split[0]]=(float)$prop[$propItem];
+										
+									}
+									else
+									{
+										$sortArray[$split[0]]=(string)$prop[$propItem];
+									}
 								}
 							}
 						}
 				}
 				if($order=="WORD")
 				{
-					$srt=asort($sortArray,SORT_STRING);
+					asort($sortArray);
 				}
 				elseif($order=="ASC")
 				{
-					$srt=asort($sortArray,SORT_NUMERIC);
+					asort($sortArray);
 				}
 				elseif($order=="DESC")
 				{
-					$srt=arsort($sortArray,SORT_NUMERIC);
+					arsort($sortArray);
 				}
 				else
 				{
 					return False;
 				}
-				foreach($srt as $key=>&$element)
+				foreach($sortArray as $key=>&$element)
 				{
 					array_push($res,array("uid"=>$key,"propValue"=>$element));
 				}
@@ -419,17 +427,17 @@
 							}
 						}
 				}
-				$cacheTimeStamp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.propItem.'_'.order.'.dgb','a');
+				$cacheTimeStamp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgb','a');
 					fwrite($cacheTimeStamp,$GLOBALS["DGSTORAGE"]["TimeStamp"]);
 					fclose($cacheTimeStamp);
-				$cacheObject=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'+propItem+'_'+order+'.dgc','a');
+				$cacheObject=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/'.$propItem.'_'.$order.'.dgc','a');
 					foreach($res as &$element)
 					{
 						fwrite($cacheObject,$element["uid"].','.$element["propValue"]."\n");
 					}
 					fclose($cacheObject);
 				$cacheIndex=fopen($GLOBALS["DGSTORAGE"]["Name"].'/cache/prop/index.dgi','a');
-					fwrite($cacheIndex,propItem.'_'.order);
+					fwrite($cacheIndex,$propItem.'_'.$order);
 					fclose($cacheIndex);
 				if($limit==-1)
 				{
@@ -437,7 +445,7 @@
 				}
 				else
 				{
-					return array_slice($rse,$skip,$limit);
+					return array_slice($res,$skip,$limit);
 				}
 			}
 		}
