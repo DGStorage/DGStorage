@@ -237,7 +237,7 @@ class DGStorage:
 							try:
 								prop[propItem];
 							except:
-								return False;
+								pass;
 							else:
 								sortArray.append({"uid":split[0],"propValue":(prop[propItem])});
 			if order=="WORD":

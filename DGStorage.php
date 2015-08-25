@@ -366,7 +366,7 @@
 								$prop=$this->getprop($split[0],$collection);
 								if($prop[$propItem]===NULL)
 								{
-									return False;
+									continue;
 								}
 								else
 								{
