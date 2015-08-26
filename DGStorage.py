@@ -338,7 +338,7 @@ class DGStorage:
 								open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp');
 							except:
 								with codecs.open(self.DGSTORAGE_Name+'/'+str(collection)+'/'+str(uid)+'.dgp','a',self.DGSTORAGE_CHARSET) as storageProp:
-									storageProp.write(propItem+','+propValue);
+									storageProp.write(propItem+':'+propValue);
 								return True;
 							else:
 								propList={};
@@ -678,9 +678,10 @@ class DGStorage:
 							line=line.replace('\n','');
 							if line!='':
 								split=line.split(':');
-								split[0]=urllib.parse.unquote_plus(str(split[0]));
-								split[1]=urllib.parse.unquote_plus(str(split[1]));
-								res[split[0]]=split[1];
+								if len(split)>=2:
+									split[0]=urllib.parse.unquote_plus(str(split[0]));
+									split[1]=urllib.parse.unquote_plus(str(split[1]));
+									res[split[0]]=split[1];
 						return res;
 		else:
 			try:
@@ -693,9 +694,10 @@ class DGStorage:
 						line=line.replace('\n','');
 						if line!='':
 							split=line.split(':');
-							split[0]=urllib.parse.unquote_plus(str(split[0]));
-							split[1]=urllib.parse.unquote_plus(str(split[1]));
-							res[split[0]]=split[1];
+							if len(split)>=2:
+								split[0]=urllib.parse.unquote_plus(str(split[0]));
+								split[1]=urllib.parse.unquote_plus(str(split[1]));
+								res[split[0]]=split[1];
 					return res;
 	
 	def uptmp(self):
