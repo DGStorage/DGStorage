@@ -413,7 +413,7 @@ class DGStorage:
 						itemList.append(row);
 			if findStatus==True:
 				with codecs.open(self.DGSTORAGE_Name+'/'+str(line)+'/index/index.dgi','w',self.DGSTORAGE_CHARSET) as collIndex:
-					string=''
+					string='';
 					for item in itemList:
 						string=str(string)+str(item)+'\n';
 					collIndex.write(string);
@@ -426,8 +426,8 @@ class DGStorage:
 				if i==0:
 					self.removecoll(str(line));
 				break;
-			if findStatus==False:
-				return False;
+		if findStatus==False:
+			return False;
 		self.uptmp();
 		return True;
 	
