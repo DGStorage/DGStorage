@@ -574,7 +574,7 @@ class DGStorage:
 			import urllib.parse;
 			key=str(urllib.parse.quote_plus(str(key)));
 		s=0;
-		i=0;
+		i=1;
 		res=[];
 		if key=='$all':
 			for collection in self.CollectionCache:
