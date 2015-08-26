@@ -1,7 +1,8 @@
-# DGStorage - Efficiency Without Compromise - 为性能，毫不妥协。
+# DGStorage - Efficiency Without Compromise.
 
-DGStorage 是一个极其适合于存储非结构化数据的快速数据库。
-使用时，只需引用DGStorage库即可。在全新改进的Build中，也可以通过Shell或者Web操作DGStorage。
+DGStorage 是一个适合于存储非结构化数据的快速数据库。
+使用时，只需在您的代码中引用DGStorage库即可。亦可以通过Shell或者Web操作DGStorage。
+You can include our DGStorage lib in your code, or using shell/web work with DGStorage.
 + 非结构化：DGStorage采用文件散列存储的方式，不像MongoDB，您不仅可以存储JSON格式的数据，也可以存储其它
 + 分布式：瞬间即可部署大量的存储实例。全新设计的索引可以使多条件查询瞬间完成
 + 快速：对于<code>10'000</code>条数据的存储，可以在<code>2</code>秒内完成。数据库的迁移也仅需要移动和压缩/解压缩
@@ -27,10 +28,14 @@ DGStorage 是一个极其适合于存储非结构化数据的快速数据库。
     
     a.get('20150101')
     
+    a.zip('db')
+    
+    a.unzip('db')
+    
 ##Python3版本的特色
 1. 提供了一系列列表的方法，如append,index等，能够按照您熟悉的方式操作数据
-
 2. 针对大数据进行优化，保障您使用喜爱的方法轻松处理大数据，而不用关心数据量的问题
+3. 提供了.zip和.unzip方法，能快速将数据库打包为一个可读的文本文件，并迅速解包
 
 #PHP5 - 方法 
 1. 在PHP代码中引用DGStorage库：
@@ -55,8 +60,6 @@ DGStorage 是一个极其适合于存储非结构化数据的快速数据库。
     
     //因为PHP不知道返回值是不是可索引序列(数组)
     
-**提示:如果PHP在Web环境下运行，默认的权限是用户权限时，可能无法访问部分目录**
-
 **提示:如果PHP在Web环境下运行，对目录的读写操作需要RWRWRW（所有人可写）权限**
 
 ##PHP5版本的特色
