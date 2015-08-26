@@ -160,6 +160,9 @@ class DGStorage:
 	
 	def fetch(self,limit=5,skip=0):
 		return self.finditemviakey('$all',limit,skip);
+		
+	def uid(self,uid):
+		return self.finditemviauid(uid);
 	
 	def search(self,keyword,cache=False):
 		import codecs;
