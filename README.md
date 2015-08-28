@@ -7,6 +7,9 @@ You can include our DGStorage lib in your code, or using shell/web work with DGS
 + 分布式：瞬间即可部署大量的存储实例。全新设计的索引可以使多条件查询瞬间完成
 + 快速：对于<code>10'000</code>条数据的存储，可以在<code>2</code>秒内完成。数据库的迁移也仅需要移动和压缩/解压缩
 
+#Twice develop
+See:https://github.com/DGideas/DGStorage-toolkit
+
 #Python3 - 方法
 1. 在Python3程序中引用DGStorage库：
     
