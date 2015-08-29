@@ -9,9 +9,11 @@ You can include our DGStorage lib in your code, or using shell/web work with DGS
 
 #Document
 See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C%AC)---%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
-#Twice develop
-See:https://github.com/DGideas/DGStorage-toolkit
+* For twice develop:https://github.com/DGideas/DGStorage-toolkit
 
+#Downloads
+* https://github.com/DGideas/DGStorage/releases
+* 
 #Python3 - Very quickly guide
 1. Import ```DGStorage``` lib in your Python3 app:
 ```Python
