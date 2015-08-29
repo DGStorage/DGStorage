@@ -13,7 +13,7 @@ See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C
 
 #Downloads
 * https://github.com/DGideas/DGStorage/releases
-* 
+
 #Python3 - Very quickly guide
 1. Import ```DGStorage``` lib in your Python3 app:
 ```Python
