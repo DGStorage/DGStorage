@@ -1,11 +1,11 @@
 # DGStorage - Efficiency Without Compromise.
 
-DGStorage 是一个适合于存储非结构化数据的快速数据库。
-Import ```DGStorage``` lib to use it. 亦可以通过Shell或者Web操作DGStorage。
+DGStorage is a database based on filesystem.
+Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely with DGStorage。
 You can include our DGStorage lib in your code, or using shell/web work with DGStorage.
-+ 非结构化：DGStorage采用文件散列存储的方式，doesn't like MongoDB，您不仅可以存储JSON格式的数据，也可以存储其它
-+ 分布式：瞬间即可部署大量的存储实例。More quickly for multiple terms query.
-+ 快速：For<code>10'000</code>datas，可以在<code>2</code>秒内完成。数据库的迁移也仅需要移动和压缩/解压缩
++ Unstruction：DGStorage based on filesystem，doesn't like MongoDB，you can not only stroage JSON fils, but also other files.
++ Distribution：Deploy more database collection in a very short time. More quickly for multiple terms query.
++ Quickly：For<code>10'000</code>datas，could finished in <code>2</code>seconds。
 
 #Document
 See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C%AC)---%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
@@ -25,7 +25,7 @@ See:https://github.com/DGideas/DGStorage-toolkit
     a=DG.DGStorage()
     
 ```
-3. 在已有文件夹的基础上创建数据库实例,或者选择一个已有的数据库实例：
+3. Create or select a database collection:
 ```Python
     
     a.create('db')
@@ -46,24 +46,24 @@ See:https://github.com/DGideas/DGStorage-toolkit
     
 ```
 ##Features for Python3 version
-1. 提供了一系列列表的方法，如append,index等，能够按照您熟悉的方式操作数据
-2. 针对大数据进行优化，保障您使用喜爱的方法轻松处理大数据，而不用关心数据量的问题
-3. 提供了.zip和.unzip方法，能快速将数据库打包为一个可读的文本文件，并迅速解包
+1. You can use (etc..) append, index method ,just like work with list object.
+2. Designed for big data, don't worry about how many datas you should deal with.
+3. Zip and unzip while database collection.
 
 #PHP5 - Very quickly guide 
-1. 在PHP代码中引用DGStorage库：
+1. Import ```DGStorage``` lib in your PHP5 app:
 ```PHP
     
     include_once('DGStorage.php');
     
 ```
-2. 创建一个数据库实例:
+2. create a database connect：
 ```PHP
     
     $a=new DGStorage();
     
 ```
-3. 在已有文件夹的基础上创建数据库实例,或者选择一个已有的数据库实例：
+3. Create or select a database collection:
 ```PHP
     
     $a->create("db");
@@ -71,17 +71,17 @@ See:https://github.com/DGideas/DGStorage-toolkit
     $a->select("db");
     
 ```
-4. 尽情使用吧!
+4. Use it!
 ```PHP
     
     $a->add('20150101','hello');
     
-    $a->get('20150101'); //PHP版本的get方法不能使用这个格式：$a->get("something")[1]
+    $a->get('20150101'); //do not use this format in PHP：$a->get("something")[1]
     
-    //因为PHP不知道返回值是不是可索引序列(数组)
+    //Becouse PHP don't know the return var is a array or not
     
 ```
-**Hint:如果PHP在Web环境下运行，对目录的读写操作需要RWRWRW（所有人可写）权限**
+**Hint:If DGStorage's PHP version running under web environment,reading dir need RWRWRW right**
 
 ##Features for PHP5 version
 1. 即将提供HTTP/HTTPS协议的API（应用程序开发接口），容许您将数据库进行网络部署
