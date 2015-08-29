@@ -974,7 +974,7 @@
 								if($line!='')
 								{
 									$split=explode(":",$line);
-									$res[$split[0]]=$split[1];
+									$res[urldecode($split[0])]=urldecode($split[1]);
 								}
 							return $res;
 							}
@@ -996,7 +996,7 @@
 							if($line!='')
 							{
 								$split=explode(":",$line);
-								$res[$split[0]]=$split[1];
+								$res[urldecode($split[0])]=urldecode($split[1]);
 							}
 						}
 						return $res;
