@@ -7,6 +7,8 @@ You can include our DGStorage lib in your code, or using shell/web work with DGS
 + 分布式：瞬间即可部署大量的存储实例。More quickly for multiple terms query.
 + 快速：For<code>10'000</code>datas，可以在<code>2</code>秒内完成。数据库的迁移也仅需要移动和压缩/解压缩
 
+#Document
+See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C%AC)---%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
 #Twice develop
 See:https://github.com/DGideas/DGStorage-toolkit
 
