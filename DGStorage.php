@@ -493,7 +493,6 @@
 			{
 				return False;
 			}
-			}
 		}
 		
 		public function setprop($uid,$propItem,$propValue)
