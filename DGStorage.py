@@ -320,9 +320,12 @@ class DGStorage:
 			if findStatus==True:
 				break;
 			else:
-				return False;
-		self.uptmp();
-		return True;
+				continue;
+		if findStatus==True:
+			self.uptmp();
+			return True;
+		else:
+			return False;
 	
 	def setprop(self,uid,propItem,propValue):
 		import codecs;
