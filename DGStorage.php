@@ -481,11 +481,19 @@
 				}
 				else
 				{
-					return False;
+					continue;
 				}
 			}
-			$this->uptmp();
-			return True;
+			if($findStatus==True)
+			{
+				$this->uptmp();
+				return True;
+			}
+			else
+			{
+				return False;
+			}
+			}
 		}
 		
 		public function setprop($uid,$propItem,$propValue)
