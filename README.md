@@ -86,9 +86,9 @@ See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C
 **Hint:If DGStorage's PHP version running under web environment,reading dir need RWRWRW right**
 
 ##Features for PHP5 version
-1. 即将提供HTTP/HTTPS协议的API（应用程序开发接口），容许您将数据库进行网络部署
+1. Will support HTTP/HTTPS protocol API.Allow you deploy DGStorage online.
 
-2. 即将提供基于HTTP/HTTPS的网页面板，轻松进行数据的可视化工作
+2. Will support HTTP/HTTPS web panel.
 
 #C++ - Method
 under developing...
