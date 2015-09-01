@@ -92,6 +92,3 @@ See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C
 
 #C++ - Method
 under developing...
-
-#Node.js - Method
-under developing...
