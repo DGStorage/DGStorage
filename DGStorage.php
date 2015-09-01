@@ -40,6 +40,7 @@
 				return False;
 			}
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]);
+			chmod($GLOBALS["DGSTORAGE"]["Name"]."/",0777);
 			$conf=fopen($GLOBALS["DGSTORAGE"]["Name"]."/conf.dgb","a");
 				fwrite($conf,$this->uuid()."\n");
 				fwrite($conf,"Version:2.1");
@@ -48,8 +49,11 @@
 			$index=fopen($GLOBALS["DGSTORAGE"]["Name"]."/index/index.dgi","a");
 				fclose($index);
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache");
+			chmod($GLOBALS["DGSTORAGE"]["Name"]."/cache",0777);
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache/search");
+			chmod($GLOBALS["DGSTORAGE"]["Name"]."/cache/search",0777);
 			mkdir($GLOBALS["DGSTORAGE"]["Name"]."/cache/prop");
+			chmod($GLOBALS["DGSTORAGE"]["Name"]."/cache/prop",0777);
 			$this->uptmp();
 			return True;
 		}
@@ -168,6 +172,7 @@
 			$storage=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgs','a');
 				fwrite($storage,(string)$content);
 				fclose($storage);
+				chmod($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgs',0777);
 			if($this->array_count($prop)!=0)
 			{
 				$storageProp=fopen($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgp','a');
@@ -178,6 +183,7 @@
 						fwrite($storageProp,(string)$prop.':'.(string)$propItem."\n");
 					}
 					fclose($storageProp);
+					chmod($GLOBALS["DGSTORAGE"]["Name"].'/'.(string)$operationCollection.'/'.(string)$uid.'.dgp',0777);
 			}
 			$this->uptmp();
 			return $uid;
@@ -701,7 +707,9 @@
 			if(!is_dir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll))
 			{
 				mkdir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll);
+				chmod($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll.'/',0777);
 				mkdir($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll."/index");
+				chmod($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll."/index/",0777);
 				$dgc=fopen($GLOBALS["DGSTORAGE"]["Name"]."/".(string)$coll."/index/index.dgi","a");
 					fclose($dgc);
 				array_push($GLOBALS["DGSTORAGE"]["CollectionCache"],(string)$coll);
