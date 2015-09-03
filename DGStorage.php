@@ -1,20 +1,20 @@
 <?php
 	//Designed for PHP5
-	//Thanks for boxfish education's help
+	//Document:https://github.com/DGideas/DGStorage/wiki
 	class DGStorage
 	{	
 		protected $DGSTORAGE=array();
 		
 		function __construct()
 		{
-			$this->DGSTORAGE["VERSION"]='2.2'; // DataCollection Version
-			$this->DGSTORAGE["CHARSET"]='utf8'; // Default Charset
-			$this->DGSTORAGE["SINGLECOLLECTIONLIMIT"]=1024; // Determine every collection can put how many datas
-			$this->DGSTORAGE["SEARCHRANGE"]=3; // Determine when find a avalible collection, how many collection can we find. None stands find all collection.
-			$this->DGSTORAGE["SEARCHINDEXLIMIT"]=64; // Determine DGStorage can storage how many indexs for quick search.
-			$this->DGSTORAGE["SEARCHCACHELIMIT"]=32; // Determine DGStorage can storage how many caches for quick responds.
-			$this->DGSTORAGE["PROPCACHELIMIT"]=16; // Determine DGStorage can storage how many caches for quick sort. 
-			$this->DGSTORAGE["SAFETY"]=True; // Security settings, True not allowed access database out of the exec path.
+			$this->DGSTORAGE["VERSION"]='2.2';
+			$this->DGSTORAGE["CHARSET"]='utf8';
+			$this->DGSTORAGE["SINGLECOLLECTIONLIMIT"]=1024;
+			$this->DGSTORAGE["SEARCHRANGE"]=3;
+			$this->DGSTORAGE["SEARCHINDEXLIMIT"]=32;
+			$this->DGSTORAGE["SEARCHCACHELIMIT"]=32;
+			$this->DGSTORAGE["PROPCACHELIMIT"]=32;
+			$this->DGSTORAGE["SAFETY"]=True;
 			
 			$this->DGSTORAGE["Name"]=NULL;
 			$this->DGSTORAGE["TimeStamp"]='';
@@ -311,7 +311,7 @@
 				}
 		}
 		
-		public function sort($propItem,$order="WORD",$limit=5,$skip=0)
+		public function sort($propItem,$order="ASC",$limit=5,$skip=0)
 		{
 			$propItem=(string)$propItem;
 			$propItem=urlencode($propItem);
