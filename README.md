@@ -1,11 +1,10 @@
 # DGStorage - Efficiency Without Compromise.
 
 DGStorage is a database based on filesystem.
-Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely with DGStorage。
-You can include our DGStorage lib in your code, or using shell/web work with DGStorage.
-+ Unstruction：DGStorage based on filesystem，doesn't like MongoDB，you can not only stroage JSON fils, but also other files.
-+ Distribution：Deploy more database collection in a very short time. More quickly for multiple terms query.
-+ Quickly：For<code>10'000</code>datas，could finished in <code>2</code>seconds。
+
+Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely with DGStorage.
+
+You can include our lib in your code, or using shell/web work with DGStorage.
 
 #Document
 See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C%AC)---%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
@@ -86,9 +85,6 @@ See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C
 **Hint:If DGStorage's PHP version running under web environment,reading dir need RWRWRW right**
 
 ##Features for PHP5 version
-1. Will support HTTP/HTTPS protocol API.Allow you deploy DGStorage online.
+1. Will support HTTP/HTTPS API.Allow you deploy DGStorage online.
 
-2. Will support HTTP/HTTPS web panel.
-
-#C++ - Method
-under developing...
+2. Will support web panel.
