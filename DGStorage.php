@@ -81,6 +81,7 @@
 					return False;
 				}
 				$array=file($this->DGSTORAGE["Name"]."/index/index.dgi");
+				$this->DGSTORAGE["CollectionCache"]=array();
 				foreach($array as &$line)
 				{
 					$line=str_replace("\n","",$line);
