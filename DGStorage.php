@@ -42,7 +42,7 @@
 			chmod($this->DGSTORAGE["Name"]."/",0777);
 			$conf=fopen($this->DGSTORAGE["Name"]."/conf.dgb","a");
 				fwrite($conf,$this->uuid()."\n");
-				fwrite($conf,"Version:2.1");
+				fwrite($conf,"Version:".$this->DGSTORAGE["VERSION"]);
 				fclose($conf);
 			mkdir($this->DGSTORAGE["Name"]."/index");
 			$index=fopen($this->DGSTORAGE["Name"]."/index/index.dgi","a");
