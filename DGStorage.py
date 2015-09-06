@@ -302,6 +302,67 @@ class DGStorage:
 				else:
 					return res[skip:skip+limit];
 	
+	def query(self,sql):
+		import codecs;
+		import uuid;
+		actionString='';
+		actionCache=[];
+		idle=False;
+		read=False;
+		readMark='';
+		for letter in sql:
+			if letter!=' ':
+				if letter=='"' or letter=="'":
+					if read=False:
+						read=True;
+						readMark=letter;
+					else:
+						if readMark==letter:
+							read=False;
+							readMark='';
+						else:
+							actionString=actionString+letter;
+				else:
+					actionString=actionString+letter;
+			elif read==True:
+				actionString=actionString+letter;
+			else:
+				actionCache.append(actionString);
+				actionString='';
+		if actionCache[0].lower()=='open':
+			try:
+				actionCache[1];
+			except:
+				return False;
+			else:
+				self.select(actionCache[1]);
+		elif actionCache[0].lower()=='select':
+			argWHERE='';
+			try:
+				actionCache[3];
+			except:
+				return False;
+			else:
+				if actionCache[2].lower()=='from':
+					self.select(actionCache[3]);
+					try:
+						actionCache[5];
+					except:
+						return False;
+					else:
+						if actionCache[4].lower()=='where':
+							argWHERE=actionCache[5];
+						else:
+							return False;
+				elif actionCache[2].lower()=='where':
+					argWHERE=actionCache[3];
+			#TODO
+		else:
+			return False;
+		
+	def sql(self,sql):
+		return self.query(sql);
+	
 	def put(self,uid,content):
 		import codecs;
 		for collection in self.CollectionCache:
@@ -792,3 +853,4 @@ if __name__ == '__main__':
 			else:
 				shell=DGStorage();
 				shell.unzip(str(sys.argv[2]));
+
