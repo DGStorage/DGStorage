@@ -303,63 +303,46 @@ class DGStorage:
 					return res[skip:skip+limit];
 	
 	def query(self,sql):
-		import codecs;
-		import uuid;
-		actionString='';
-		actionCache=[];
-		idle=False;
-		read=False;
-		readMark='';
-		for letter in sql:
-			if letter!=' ':
-				if letter=='"' or letter=="'":
-					if read=False:
-						read=True;
-						readMark=letter;
+		action=[];
+		action=sql.split(';');
+		for sqlQuery in action:
+			argCount=0;
+			readAble=False;
+			start=True;
+			readMark='';
+			operation=[];
+			actionString='';
+			pvLetter='';
+			for letter in sqlQuery:
+				if letter!=' ':
+					if start==True:
+						argCount+=1;
+						start=False;
+						actionString=actionString+letter;
 					else:
-						if readMark==letter:
-							read=False;
-							readMark='';
+						if letter=='"' or letter=="'":
+							if readAble==True:
+								if readMark==letter:
+									if pvLetter!='\\':
+										operation[argCount].append(actionString);
+									else:
+										actionString=actionString+letter;
+										actionString.replace('\\'+letter,letter);
+								else:
+									actionString=actionString+letter;
+							else:
+								if pvLetter!='\\':
+									readAble=True;
+									readMark=letter;
+								else:
+									actionString=actionString+letter;
+									actionString.replace('\\'+letter,letter);
 						else:
 							actionString=actionString+letter;
 				else:
-					actionString=actionString+letter;
-			elif read==True:
-				actionString=actionString+letter;
-			else:
-				actionCache.append(actionString);
-				actionString='';
-		if actionCache[0].lower()=='open':
-			try:
-				actionCache[1];
-			except:
-				return False;
-			else:
-				self.select(actionCache[1]);
-		elif actionCache[0].lower()=='select':
-			argWHERE='';
-			try:
-				actionCache[3];
-			except:
-				return False;
-			else:
-				if actionCache[2].lower()=='from':
-					self.select(actionCache[3]);
-					try:
-						actionCache[5];
-					except:
-						return False;
-					else:
-						if actionCache[4].lower()=='where':
-							argWHERE=actionCache[5];
-						else:
-							return False;
-				elif actionCache[2].lower()=='where':
-					argWHERE=actionCache[3];
-			#TODO
-		else:
-			return False;
-		
+					if pvLetter!='\\':
+						
+	
 	def sql(self,sql):
 		return self.query(sql);
 	
