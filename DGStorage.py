@@ -310,8 +310,7 @@ class DGStorage:
 		word="";
 		mode="NORM"; #NORM,QUOTE,SELECT
 		for letter in sql:
-			#...
-			pass;
+			
 	
 	def sql(self,sql):
 		return self.query(sql);
