@@ -7,7 +7,7 @@ class DGStorage:
 		import os;
 		import sys;
 		
-		self.DGSTORAGE_VERSION='2.2';
+		self.DGSTORAGE_VERSION='2.3';
 		self.DGSTORAGE_CHARSET='utf8';
 		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
 		self.DGSTORAGE_SEARCHRANGE=3;
@@ -308,6 +308,7 @@ class DGStorage:
 		operation=[];
 		operation[0]=[];
 		operationStack=0;
+		suboperationStack=0;
 		select=[];
 		word="";
 		selectword="";

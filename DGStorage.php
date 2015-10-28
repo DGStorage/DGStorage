@@ -7,7 +7,7 @@
 		
 		function __construct()
 		{
-			$this->DGSTORAGE["VERSION"]='2.2';
+			$this->DGSTORAGE["VERSION"]='2.3';
 			$this->DGSTORAGE["CHARSET"]='utf8';
 			$this->DGSTORAGE["SINGLECOLLECTIONLIMIT"]=1024;
 			$this->DGSTORAGE["SEARCHRANGE"]=3;
