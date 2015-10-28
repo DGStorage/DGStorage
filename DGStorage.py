@@ -306,7 +306,7 @@ class DGStorage:
 		import codecs;
 		import uuid;
 		operation=[];
-		operation[0]=[];
+		operation[0]=[]; #TODO:DEV:[operation_id[operaction[suboperation(select_item)]]];
 		operationStack=0;
 		suboperationStack=0;
 		select=[];
