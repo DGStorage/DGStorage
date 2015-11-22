@@ -7,7 +7,7 @@ class DGStorage:
 		import os;
 		import sys;
 		
-		self.DGSTORAGE_VERSION='2.3';
+		self.DGSTORAGE_VERSION='2.4';
 		self.DGSTORAGE_CHARSET='utf8';
 		self.DGSTORAGE_SINGLECOLLECTIONLIMIT=1024;
 		self.DGSTORAGE_SEARCHRANGE=3;
@@ -54,6 +54,7 @@ class DGStorage:
 			os.mkdir(self.DGSTORAGE_Name+'/cache');
 			os.mkdir(self.DGSTORAGE_Name+'/cache/search');
 			os.mkdir(self.DGSTORAGE_Name+'/cache/prop');
+			os.mkdir(self.DGSTORAGE_Name+'/index/BTree');
 			self.uptmp();
 			return True;
 	
@@ -314,7 +315,7 @@ class DGStorage:
 		selectword="";
 		mode="NORM"; #NORM,QUOTE,SELECT
 		for letter in sql:
-			
+			pass;
 	
 	def sql(self,sql):
 		return self.query(sql);

@@ -7,7 +7,7 @@
 		
 		function __construct()
 		{
-			$this->DGSTORAGE["VERSION"]='2.3';
+			$this->DGSTORAGE["VERSION"]='2.4';
 			$this->DGSTORAGE["CHARSET"]='utf8';
 			$this->DGSTORAGE["SINGLECOLLECTIONLIMIT"]=1024;
 			$this->DGSTORAGE["SEARCHRANGE"]=3;
@@ -53,6 +53,8 @@
 			chmod($this->DGSTORAGE["Name"]."/cache/search",0777);
 			mkdir($this->DGSTORAGE["Name"]."/cache/prop");
 			chmod($this->DGSTORAGE["Name"]."/cache/prop",0777);
+			mkdir($this->DGSTORAGE["Name"]."/index/BTree");
+			chmod($this->DGSTORAGE["Name"]."/index/BTree",0777);
 			$this->uptmp();
 			return True;
 		}
