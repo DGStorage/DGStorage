@@ -306,7 +306,7 @@ class DGStorage:
 		import codecs;
 		import uuid;
 		operation=[];
-		operation[0]=[]; #TODO:DEV:[operation_id[operaction[suboperation(select_item)]]];
+		operation[0]=[]; #DEV:[operation_id[operaction[suboperation(select_item)]]];
 		operationStack=0;
 		suboperationStack=0;
 		select=[];
@@ -314,23 +314,7 @@ class DGStorage:
 		selectword="";
 		mode="NORM"; #NORM,QUOTE,SELECT
 		for letter in sql:
-			if letter!="'" and letter!='"' and letter!=";" and letter!=",":
-				if mode=="NORM":
-					if letter!=" ":
-						word+=letter;
-					else:
-						if word!="":
-							operation[operationStack].append(word);
-						else:
-							pass;
-				elif mode=="QUOTE":
-					word+=letter;
-				elif mode=="SELECT":
-					selectword+=letter;
-			elif letter=="'" or letter=='"':
-				if mode=="SELECT":
-					mode="NORM";
-					
+			
 	
 	def sql(self,sql):
 		return self.query(sql);
