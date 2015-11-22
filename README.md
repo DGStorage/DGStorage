@@ -58,7 +58,7 @@ See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C
 1. Import ```DGStorage``` lib in your PHP5 app:
 ```PHP
     
-    include_once('DGStorage.php');
+    include('DGStorage.php');
     
 ```
 2. create a database connect：
