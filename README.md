@@ -1,5 +1,8 @@
 # DGStorage - Efficiency Without Compromise.
 
+Python Version:
+[![Build Status](https://travis-ci.org/DGideas/DGStorage.svg?branch=master)](https://travis-ci.org/DGideas/DGStorage)
+
 DGStorage is a database based on filesystem.
 
 Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely with DGStorage.

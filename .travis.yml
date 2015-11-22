@@ -1,0 +1,6 @@
+language: python
+matrix:
+  include:
+    - python: "3.3"
+      env: TEST_SUITE=suite_3_3
+script: python DGStorage.py

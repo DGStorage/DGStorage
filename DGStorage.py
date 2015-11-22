@@ -765,12 +765,12 @@ class DGStorageShell(DGStorage):
 		f.close();
 
 if __name__ == '__main__':
+	import sys;
 	try:
 		sys.argv[1];
 	except IndexError:
 		pass;
 	else:
-		import sys;
 		if sys.argv[1]=='add':
 			try:
 				sys.argv[4];
