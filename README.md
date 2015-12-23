@@ -2,6 +2,7 @@
 
 Python Version:
 [![Build Status](https://travis-ci.org/DGideas/DGStorage.svg?branch=master)](https://travis-ci.org/DGideas/DGStorage)
+[![Build status](https://ci.appveyor.com/api/projects/status/43hfd4pbj78ukw0t?svg=true)](https://ci.appveyor.com/project/DGideas/dgstorage)
 
 DGStorage is a database based on filesystem.
 
