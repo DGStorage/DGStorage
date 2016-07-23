@@ -9,63 +9,61 @@
 #include <cstdlib>
 #include <cstring>
 
-using namespace std;
-
 class DGStorage
 {
 	private:
-		string            VERSION;
-		string            CHARSET;
-		int               SINGLECOLLECTIONLIMIT;
-		int               SEARCHRANGE;
-		int               SEARCHINDEXLIMIT;
-		int               SEARCHCACHELIMIT;
-		int               PROPCACHELIMIT;
-		bool              SAFETY;
-		int               OS;
+		std::string              VERSION;
+		std::string              CHARSET;
+		int                      SINGLECOLLECTIONLIMIT;
+		int                      SEARCHRANGE;
+		int                      SEARCHINDEXLIMIT;
+		int                      SEARCHCACHELIMIT;
+		int                      PROPCACHELIMIT;
+		bool                     SAFETY;
+		int                      OS;
 	private:
-		string            Name;
-		string            TimeStamp;
-		vector<string>    CollectionCache;
-		string            LastCollection;
-		vector<string>    SearchCache;
+		std::string              Name;
+		std::string              TimeStamp;
+		std::vector<std::string> CollectionCache;
+		std::string              LastCollection;
+		std::vector<std::string> SearchCache;
 	public:
 		struct DGSObject;
 		DGStorage();
-		bool              create (string);
-		bool              select (string);
-		bool              add (string, string, vector<map<string, string> >);
-		DGSObject         get (string, int, unsigned int);
-		DGSObject         fetch (int, unsigned int);
-		DGSObject         uid (string);
-		vector<DGSObject> search (string, bool);
-		DGSObject         pervious (string);
-		DGSObject         following (string);
-		DGSObject         sort (string, string, int, unsigned int);
-		bool              put (string, string);
-		bool              setprop (string, string, string);
-		bool              removeprop (string, string);
-		bool              remove (string);
-		bool              zip (string);
-		bool              unzip (string);
+		bool                     create (std::string);
+		bool                     select (std::string);
+		bool                     add (std::string, std::string, std::vector<std::map<std::string, std::string> >);
+		DGSObject                get (std::string, int, unsigned int);
+		DGSObject                fetch (int, unsigned int);
+		DGSObject                uid (std::string);
+		std::vector<DGSObject>   search (std::string, bool);
+		DGSObject                pervious (std::string);
+		DGSObject                following (std::string);
+		DGSObject                sort (std::string, std::string, int, unsigned int);
+		bool                     put (std::string, std::string);
+		bool                     setprop (std::string, std::string, std::string);
+		bool                     removeprop (std::string, std::string);
+		bool                     remove (std::string);
+		bool                     zip (std::string);
+		bool                     unzip (std::string);
 	protected:
-		void              clche (string);
-		bool              createcoll (string);
-		bool              removecoll (string);
-		string            findavailablecoll (bool);
-		DGSObject         finditemviakey (string, int, unsigned int);
-		DGSObject         finditemviauid (string, string);
-		DGSObject         getprop (string, string);
-		bool              uptmp ();
+		void                     clche (std::string);
+		bool                     createcoll (std::string);
+		bool                     removecoll (std::string);
+		std::string              findavailablecoll (bool);
+		DGSObject                finditemviakey (std::string, int, unsigned int);
+		DGSObject                finditemviauid (std::string, std::string);
+		DGSObject                getprop (std::string, std::string);
+		bool                     uptmp ();
 	protected:
-		string            urlencode(string);
-		bool              mkdir(string);
-		char*             strtochar(string, int);
-		char*             strlcat(char*, const char*);
+		std::string              urlencode(std::string);
+		bool                     mkdir(std::string);
+		char*                    strtochar(std::string, int);
+		char*                    strlcat(char*, const char*);
 	public:
 		struct DGSObject
 		{
-			string name;
+			std::string name;
 		};
 };
 
@@ -81,11 +79,11 @@ DGStorage::DGStorage()
 	this->SAFETY                = true;
 	this->Name                  = "";
 	this->TimeStamp             = "";
-	vector<string> nullArray;
+	std::vector<std::string> nullArray;
 	this->CollectionCache       = nullArray;
 	this->LastCollection        = "";
 	this->SearchCache           = nullArray;
-	if (system("ver") == 0)
+	if (std::system("ver") == 0)
 	{
 		this->OS = 0;
 	}
@@ -95,23 +93,24 @@ DGStorage::DGStorage()
 	}
 }
 
-bool DGStorage::create(string name)
+bool DGStorage::create(std::string name)
 {
 	this->Name = name;
 	if (this->SAFETY)
 	{
 		this->Name = this->urlencode(this->Name);
 	}
-	
+	this->mkdir(this->Name);
+
 }
 
-string DGStorage::urlencode(string raw_string)
+std::string DGStorage::urlencode(std::string raw_string)
 {
 	// TODO
 	return raw_string;
 }
 
-bool DGStorage::mkdir(string dir)
+bool DGStorage::mkdir(std::string dir)
 {
 	char* dir_char = this->strtochar(dir, 10);
 	switch (this->OS)
@@ -123,12 +122,12 @@ bool DGStorage::mkdir(string dir)
 			this->strlcat(dir_char, "mkdir ");
 			break;
 	}
-	int status = system(dir_char);
+	int status = std::system(dir_char);
 	delete dir_char;
 	return !status;
 }
 
-char* DGStorage::strtochar(string raw_string, int offset=0)
+char* DGStorage::strtochar(std::string raw_string, int offset=0)
 {
 	int char_array_size = raw_string.size() + offset + 1;
 	char* res = new char[char_array_size];
@@ -137,7 +136,7 @@ char* DGStorage::strtochar(string raw_string, int offset=0)
 	{
 		res[i] = '\0';
 	}
-	for (string::iterator raw_string_i = raw_string.begin();
+	for (std::string::iterator raw_string_i = raw_string.begin();
 		raw_string_i < raw_string.end();
 		raw_string_i++)
 	{
@@ -149,8 +148,8 @@ char* DGStorage::strtochar(string raw_string, int offset=0)
 
 char* DGStorage::strlcat(char* source, const char* somechars)
 {
-	int offsetLength = strlen(somechars);
-	for (int i=strlen(source)-1; i>=0; i--)
+	int offsetLength = std::strlen(somechars);
+	for (int i=std::strlen(source)-1; i>=0; i--)
 	{
 		source[i+offsetLength] = source[i];
 	}
