@@ -60,7 +60,7 @@ class DGStorage
 	protected:
 		string            urlencode(string);
 		bool              mkdir(string);
-		char*             strtochar(string);
+		char*             strtochar(string, int);
 		char*             strlcat(char*, const char*);
 	public:
 		struct DGSObject
@@ -117,11 +117,14 @@ bool DGStorage::mkdir(string dir)
 	switch (this->OS)
 	{
 		case 0:
+			this->strlcat(dir_char, "md ");
 			break;
 		case 1:
+			this->strlcat(dir_char, "mkdir ");
 			break;
 	}
-	int status = system(dir);
+	int status = system(dir_char);
+	delete dir_char;
 	return !status;
 }
 
@@ -147,7 +150,15 @@ char* DGStorage::strtochar(string raw_string, int offset=0)
 char* DGStorage::strlcat(char* source, const char* somechars)
 {
 	int offsetLength = strlen(somechars);
-	
+	for (int i=strlen(source)-1; i>=0; i--)
+	{
+		source[i+offsetLength] = source[i];
+	}
+	for (int i=0; i<offsetLength; i++)
+	{
+		source[i] = somechars[i];
+	}
+	return source;
 }
 
 int main(int argc, char* argv[])
