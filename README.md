@@ -11,7 +11,7 @@ Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely wit
 You can include our lib in your code, or using shell/web work with DGStorage.
 
 #Document
-See:https://github.com/DGideas/DGStorage/wiki/Version-Lambda-(LTS%E7%89%88%E6%9C%AC)---%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
+See:https://github.com/DGStorage/DGStorage/wiki/Dorado-(2016%E5%B9%B41%E6%9C%88%EF%BC%8CLTS%E7%89%88%E6%9C%AC)-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
 * For twice develop:https://github.com/DGideas/DGStorage-toolkit
 
 #Downloads

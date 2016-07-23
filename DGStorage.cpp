@@ -59,6 +59,7 @@ class DGStorage
 	protected:
 		std::string              urlencode(std::string);
 		bool                     mkdir(std::string);
+		char*                    strtochar(std::string);
 		char*                    strtochar(std::string, int);
 		char*                    strlcat(char*, const char*);
 		char*                    getchar(const char*, const char*);
@@ -104,7 +105,7 @@ bool DGStorage::create(std::string name)
 	}
 	this->mkdir(this->Name);
 	std::fstream conf;
-	char* fileLocation = getchar(strtochar(this->Name, 0), "/conf.dgb");
+	char* fileLocation = getchar(strtochar(this->Name), "/conf.dgb");
 	conf.open(fileLocation, std::fstream::app);
 	delete fileLocation;
 	conf.close();
@@ -131,6 +132,11 @@ bool DGStorage::mkdir(std::string dir)
 	int status = std::system(dir_char);
 	delete dir_char;
 	return !status;
+}
+
+char* DGStorage::strtochar(std::string raw_string)
+{
+	return this->strtochar(raw_string, 0);
 }
 
 char* DGStorage::strtochar(std::string raw_string, int offset)
