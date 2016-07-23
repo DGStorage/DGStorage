@@ -2,6 +2,7 @@
 // @DGideas dgideas@outlook.com
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -60,6 +61,7 @@ class DGStorage
 		bool                     mkdir(std::string);
 		char*                    strtochar(std::string, int);
 		char*                    strlcat(char*, const char*);
+		char*                    getchar(const char*, const char*);
 	public:
 		struct DGSObject
 		{
@@ -101,7 +103,8 @@ bool DGStorage::create(std::string name)
 		this->Name = this->urlencode(this->Name);
 	}
 	this->mkdir(this->Name);
-
+	std::fstream conf;
+	conf.open();
 }
 
 std::string DGStorage::urlencode(std::string raw_string)
@@ -158,6 +161,40 @@ char* DGStorage::strlcat(char* source, const char* somechars)
 		source[i] = somechars[i];
 	}
 	return source;
+}
+
+char* DGStorage::getchar(const char* char1, const char* char2)
+{
+	int length = 0;
+	for (int i=0; i<std::strlen(char1); i++)
+	{
+		if (char1[i] != '\0')
+		{
+			length++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	for (int i=0; i<str::strlen(char2); i++)
+	{
+		if (char2[i] != '\0')
+		{
+			length++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	char* res = new char[length+1];
+	char* res_begin = res;
+
+	for (int i=0; i<str::strlen(char1); i++)
+	{
+		
+	}
 }
 
 int main(int argc, char* argv[])
