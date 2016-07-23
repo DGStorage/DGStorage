@@ -57,6 +57,7 @@ class DGStorage
 		DGSObject                getprop (std::string, std::string);
 		bool                     uptmp ();
 	protected:
+		std::string              uuid();
 		std::string              urlencode(std::string);
 		bool                     mkdir(std::string);
 		char*                    strtochar(std::string);
@@ -105,10 +106,18 @@ bool DGStorage::create(std::string name)
 	}
 	this->mkdir(this->Name);
 	std::fstream conf;
-	char* fileLocation = getchar(strtochar(this->Name), "/conf.dgb");
+	char* tmpchar = strtochar(this->Name);
+	char* fileLocation = getchar(tmpchar, "/conf.dgb");
 	conf.open(fileLocation, std::fstream::app);
+	delete tmpchar;
 	delete fileLocation;
+	
 	conf.close();
+}
+
+std::string DGStorage::uuid()
+{
+	return "0420f696-eab6-401d-8304-20d34d7268b9";
 }
 
 std::string DGStorage::urlencode(std::string raw_string)
