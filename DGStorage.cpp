@@ -104,7 +104,10 @@ bool DGStorage::create(std::string name)
 	}
 	this->mkdir(this->Name);
 	std::fstream conf;
-	conf.open();
+	char* fileLocation = getchar(strtochar(this->Name, 0), "/conf.dgb");
+	conf.open(fileLocation, std::fstream::app);
+	delete fileLocation;
+	conf.close();
 }
 
 std::string DGStorage::urlencode(std::string raw_string)
@@ -130,7 +133,7 @@ bool DGStorage::mkdir(std::string dir)
 	return !status;
 }
 
-char* DGStorage::strtochar(std::string raw_string, int offset=0)
+char* DGStorage::strtochar(std::string raw_string, int offset)
 {
 	int char_array_size = raw_string.size() + offset + 1;
 	char* res = new char[char_array_size];
@@ -177,7 +180,7 @@ char* DGStorage::getchar(const char* char1, const char* char2)
 			break;
 		}
 	}
-	for (int i=0; i<str::strlen(char2); i++)
+	for (int i=0; i<std::strlen(char2); i++)
 	{
 		if (char2[i] != '\0')
 		{
@@ -190,14 +193,37 @@ char* DGStorage::getchar(const char* char1, const char* char2)
 	}
 	char* res = new char[length+1];
 	char* res_begin = res;
-
-	for (int i=0; i<str::strlen(char1); i++)
+	for (int i=0; i<std::strlen(char1); i++)
 	{
-		
+		if (char1[i] != '\0')
+		{
+			*res = char1[i];
+			res++;
+		}
+		else
+		{
+			break;
+		}
 	}
+	for (int i=0; i<std::strlen(char2); i++)
+	{
+		if (char2[i] != '\0')
+		{
+			*res = char2[i];
+			res++;
+		}
+		else
+		{
+			break;
+		}
+	}
+	*res = '\0';
+	return res_begin;
 }
 
 int main(int argc, char* argv[])
 {
-	
+	DGStorage a;
+	a.create("haha");
+	return 0;
 }
