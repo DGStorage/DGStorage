@@ -12,6 +12,7 @@
 
 class DGStorage
 {
+	public class io;
 	private:
 		std::string              VERSION;
 		std::string              CHARSET;
@@ -57,13 +58,15 @@ class DGStorage
 		DGSObject                getprop (std::string, std::string);
 		bool                     uptmp ();
 	protected:
-		std::string              uuid();
-		std::string              urlencode(std::string);
-		bool                     mkdir(std::string);
-		char*                    strtochar(std::string);
-		char*                    strtochar(std::string, int);
-		char*                    strlcat(char*, const char*);
-		char*                    getchar(const char*, const char*);
+		std::string              uuid ();
+		std::string              urlencode (std::string);
+		bool                     mkdir (std::string);
+		bool                     mkdir (const char*);
+		char*                    strtochar (std::string);
+		char*                    strtochar (std::string, int);
+		char*                    strlcat (char*, const char*);
+		char*                    getchar (const char*, const char*);
+		void                     fopen (std::fstream&, str::string);
 	public:
 		struct DGSObject
 		{
@@ -111,8 +114,13 @@ bool DGStorage::create(std::string name)
 	conf.open(fileLocation, std::fstream::app);
 	delete tmpchar;
 	delete fileLocation;
-	
+	conf<<this->uuid()<<"\n";
+	conf<<"Version:"<<this->VERSION<<"\n";
 	conf.close();
+	this->mkdir("/index");
+	std::fstream index;
+	index.open();
+	
 }
 
 std::string DGStorage::uuid()
@@ -124,6 +132,21 @@ std::string DGStorage::urlencode(std::string raw_string)
 {
 	// TODO
 	return raw_string;
+}
+
+bool DGStorage::mkdir(const char* dir)
+{
+	switch (this->OS)
+	{
+		case 0:
+			this->strlcat(dir, "md ");
+			break;
+		case 1:
+			this->strlcat(dir, "mkdir ");
+			break;
+	}
+	int status = std::system(dir);
+	return !status;
 }
 
 bool DGStorage::mkdir(std::string dir)
@@ -234,6 +257,11 @@ char* DGStorage::getchar(const char* char1, const char* char2)
 	}
 	*res = '\0';
 	return res_begin;
+}
+
+void DGStorage::fopen(std::fstream& fileHandle, std::string fileLocation)
+{
+	return;
 }
 
 int main(int argc, char* argv[])
