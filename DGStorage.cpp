@@ -12,7 +12,6 @@
 
 class DGStorage
 {
-	public class io;
 	private:
 		std::string              VERSION;
 		std::string              CHARSET;
@@ -66,7 +65,8 @@ class DGStorage
 		char*                    strtochar (std::string, int);
 		char*                    strlcat (char*, const char*);
 		char*                    getchar (const char*, const char*);
-		void                     fopen (std::fstream&, str::string);
+		void                     fopen (std::fstream&, std::string);
+		char*                    expandchar (const char*, int);
 	public:
 		struct DGSObject
 		{
@@ -109,17 +109,11 @@ bool DGStorage::create(std::string name)
 	}
 	this->mkdir(this->Name);
 	std::fstream conf;
-	char* tmpchar = strtochar(this->Name);
-	char* fileLocation = getchar(tmpchar, "/conf.dgb");
-	conf.open(fileLocation, std::fstream::app);
-	delete tmpchar;
-	delete fileLocation;
+	this->fopen(conf, this->Name+"/conf.dgb");
 	conf<<this->uuid()<<"\n";
 	conf<<"Version:"<<this->VERSION<<"\n";
 	conf.close();
 	this->mkdir("/index");
-	std::fstream index;
-	index.open();
 	
 }
 
@@ -136,16 +130,18 @@ std::string DGStorage::urlencode(std::string raw_string)
 
 bool DGStorage::mkdir(const char* dir)
 {
+	char* dir_char = this->expandchar(dir, 10);
 	switch (this->OS)
 	{
 		case 0:
-			this->strlcat(dir, "md ");
+			this->strlcat(dir_char, "md ");
 			break;
 		case 1:
-			this->strlcat(dir, "mkdir ");
+			this->strlcat(dir_char, "mkdir ");
 			break;
 	}
 	int status = std::system(dir);
+	delete dir_char;
 	return !status;
 }
 
@@ -261,7 +257,25 @@ char* DGStorage::getchar(const char* char1, const char* char2)
 
 void DGStorage::fopen(std::fstream& fileHandle, std::string fileLocation)
 {
+	char* fileLocationChar = this->strtochar(fileLocation);
+	fileHandle.open(fileLocationChar, std::fstream::app);
+	delete fileLocationChar;
 	return;
+}
+
+char* DGStorage::expandchar(const char* originChar, int expandSize)
+{
+	int strSize = strlen(originChar) + expandSize + 1;
+	char* res = new char[strSize];
+	for (int i=0; i<strSize; i++)
+	{
+		res[i] = '\0';
+	}
+	for (int i=0; i<strlen(originChar); i++)
+	{
+		res[i] = originChar[i];
+	}
+	return res;
 }
 
 int main(int argc, char* argv[])
