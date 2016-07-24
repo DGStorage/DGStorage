@@ -65,7 +65,7 @@ class DGStorage
 		char*                    strtochar (std::string, int);
 		char*                    strlcat (char*, const char*);
 		char*                    getchar (const char*, const char*);
-		void                     fopen (std::fstream&, std::string);
+		void                     fopen (std::fstream&, std::string, std::ios_base::openmode);
 		char*                    expandchar (const char*, int);
 	public:
 		struct DGSObject
@@ -109,7 +109,7 @@ bool DGStorage::create(std::string name)
 	}
 	this->mkdir(this->Name);
 	std::fstream conf;
-	this->fopen(conf, this->Name+"/conf.dgb");
+	this->fopen(conf, this->Name+"/conf.dgb", std::fstream::app);
 	conf<<this->uuid()<<"\n";
 	conf<<"Version:"<<this->VERSION<<"\n";
 	conf.close();
@@ -255,10 +255,10 @@ char* DGStorage::getchar(const char* char1, const char* char2)
 	return res_begin;
 }
 
-void DGStorage::fopen(std::fstream& fileHandle, std::string fileLocation)
+void DGStorage::fopen(std::fstream& fileHandle, std::string fileLocation, std::ios_base::openmode fileOpenmode)
 {
 	char* fileLocationChar = this->strtochar(fileLocation);
-	fileHandle.open(fileLocationChar, std::fstream::app);
+	fileHandle.open(fileLocationChar, fileOpenmode);
 	delete fileLocationChar;
 	return;
 }
