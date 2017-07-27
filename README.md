@@ -10,14 +10,14 @@ Import ```DGStorage``` lib to use it. alos can use Shell or Web work closely wit
 
 You can include our lib in your code, or using shell/web work with DGStorage.
 
-#Document
+# Document
 See:https://github.com/DGStorage/DGStorage/wiki/Dorado-(2016%E5%B9%B41%E6%9C%88%EF%BC%8CLTS%E7%89%88%E6%9C%AC)-%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%E6%96%87%E6%A1%A3
 * For twice develop:https://github.com/DGideas/DGStorage-toolkit
 
-#Downloads
+# Downloads
 * https://github.com/DGideas/DGStorage/releases
 
-#Python3 - Very quickly guide
+# Python3 - Very quickly guide
 1. Import ```DGStorage``` lib in your Python3 app:
 ```Python
     
@@ -50,12 +50,12 @@ See:https://github.com/DGStorage/DGStorage/wiki/Dorado-(2016%E5%B9%B41%E6%9C%88%
     a.unzip('db')
     
 ```
-##Features for Python3 version
+## Features for Python3 version
 1. You can use (etc..) append, index method ,just like work with list object.
 2. Designed for big data, don't worry about how many datas you should deal with.
 3. Zip and unzip while database collection.
 
-#PHP5 - Very quickly guide 
+# PHP5 - Very quickly guide 
 1. Import ```DGStorage``` lib in your PHP5 app:
 ```PHP
     
@@ -88,7 +88,7 @@ See:https://github.com/DGStorage/DGStorage/wiki/Dorado-(2016%E5%B9%B41%E6%9C%88%
 ```
 **Hint:If DGStorage's PHP version running under web environment,reading dir need RWRWRW right**
 
-##Features for PHP5 version
+## Features for PHP5 version
 1. Will support HTTP/HTTPS API.Allow you deploy DGStorage online.
 
 2. Will support web panel.
